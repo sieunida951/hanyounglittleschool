@@ -1,0 +1,2798 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한영외고 2학년 6반 시간표·학사일정 알리미</title>
+
+<style>
+:root {
+  color-scheme: light;
+  --navy:#233b63;
+  --blue:#456ca8;
+  --light-blue:#edf3fc;
+  --background:#f4f6fa;
+  --card:#ffffff;
+  --panel:#f7f9fd;
+  --border:#e2e7ef;
+  --text:#263449;
+  --muted:#6b7789;
+  --red:#c64d4d;
+  --green:#39845a;
+  --purple:#7954a5;
+  --shadow:0 4px 16px #1b315008;
+}
+
+body[data-theme="dark"] {
+  color-scheme:dark;
+  --navy:#a9c4f0;
+  --blue:#8eafe5;
+  --light-blue:#263851;
+  --background:#141b27;
+  --card:#1e2938;
+  --panel:#202e40;
+  --border:#35445a;
+  --text:#e5ebf5;
+  --muted:#a5b1c3;
+  --red:#f18b8b;
+  --green:#7dc99a;
+  --purple:#c0a0e8;
+  --shadow:0 4px 16px #00000020;
+}
+
+* { box-sizing:border-box; }
+
+body {
+  margin:0;
+  background:var(--background);
+  color:var(--text);
+  font-family:"Noto Sans KR",Arial,sans-serif;
+  line-height:1.6;
+  transition:background .2s,color .2s;
+}
+
+.container {
+  width:min(100% - 32px,1250px);
+  margin:auto;
+  padding:30px 0;
+}
+
+.hero {
+  background:#233b63;
+  color:white;
+  border-radius:20px;
+  padding:28px;
+  margin-bottom:20px;
+}
+
+.school-label {
+  font-size:13px;
+  color:#d5e1f5;
+  margin-bottom:8px;
+}
+
+h1 {
+  font-size:clamp(22px,4vw,30px);
+  line-height:1.4;
+  margin:0 0 10px;
+}
+
+.hero p {
+  color:#e0e8f5;
+  margin:0;
+  font-size:14px;
+}
+
+.hero-top {
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:15px;
+}
+
+.class-badge {
+  display:inline-block;
+  margin-top:18px;
+  padding:7px 12px;
+  background:#ffffff1c;
+  border:1px solid #ffffff40;
+  border-radius:20px;
+  font-size:13px;
+}
+
+.theme-button {
+  flex-shrink:0;
+  border:1px solid #ffffff65;
+  background:#ffffff18;
+  color:white;
+  border-radius:10px;
+  padding:9px 13px;
+  font:inherit;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.theme-button:hover {
+  background:#ffffff30;
+}
+
+.card {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:22px;
+  margin-bottom:18px;
+  box-shadow:var(--shadow);
+}
+
+h2 {
+  font-size:19px;
+  margin:0 0 15px;
+}
+
+.top-dashboard {
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(260px,.8fr);
+  gap:18px;
+  margin-bottom:18px;
+}
+
+.top-dashboard .card {
+  margin:0;
+  min-width:0;
+}
+
+.month-detail-layout {
+  display:grid;
+  grid-template-columns:minmax(0,1.5fr) minmax(240px,.8fr);
+  gap:16px;
+  align-items:stretch;
+}
+
+.month-calendar-area { min-width:0; }
+
+.month-navigation,
+.week-navigation {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  margin-bottom:15px;
+}
+
+.month-navigation h2,
+.week-navigation h2 {
+  margin:0;
+  text-align:center;
+  flex:1;
+}
+
+.nav-button {
+  min-height:38px;
+  padding:7px 13px;
+  border:1px solid var(--border);
+  border-radius:9px;
+  background:var(--card);
+  color:var(--navy);
+  font:inherit;
+  font-size:13px;
+  font-weight:700;
+  cursor:pointer;
+}
+
+.nav-button:hover {
+  background:var(--light-blue);
+}
+
+/* 월간 달력 */
+.calendar-grid {
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  gap:4px;
+}
+
+.calendar-weekday {
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+  padding:5px 0;
+  font-weight:700;
+}
+
+/* 한 주 단위 달력: 날짜 + 여러 날 일정 막대 */
+.month-week {
+  grid-column:1 / -1;
+  display:grid;
+  grid-template-columns:repeat(7,minmax(0,1fr));
+  grid-template-rows:78px repeat(var(--lane-count),15px);
+  gap:3px 4px;
+  min-width:0;
+}
+
+.month-day {
+  grid-row:1;
+  min-width:0;
+  min-height:0;
+  border:1px solid transparent;
+  background:var(--card);
+  border-radius:9px;
+  padding:5px 2px;
+  text-align:center;
+  cursor:pointer;
+  color:var(--text);
+  font:inherit;
+  overflow:hidden;
+}
+
+.month-day:hover {
+  background:var(--light-blue);
+  border-color:#b9cbea;
+}
+
+.month-day.outside {
+  color:var(--muted);
+  opacity:.55;
+  background:var(--panel);
+}
+
+.month-day.today {
+  border:2px solid var(--blue);
+  background:var(--light-blue);
+}
+
+.month-day.selected {
+  background:var(--light-blue);
+  border:2px solid var(--navy);
+}
+
+.month-day .number {
+  display:block;
+  font-size:14px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.month-day.selected .number {
+  color:var(--navy);
+}
+
+/* 여러 날 일정 가로 막대 */
+.event-bar {
+  min-width:0;
+  height:13px;
+  line-height:13px;
+  font-size:9px;
+  font-weight:700;
+  overflow:hidden;
+  white-space:nowrap;
+  text-overflow:ellipsis;
+  padding:0 4px;
+  z-index:2;
+  align-self:center;
+  pointer-events:none;
+  border-radius:0;
+}
+
+.event-bar.start {
+  border-radius:6px 0 0 6px;
+}
+
+.event-bar.end {
+  border-radius:0 6px 6px 0;
+}
+
+.event-bar.start.end {
+  border-radius:6px;
+}
+
+.event-bar.exam {
+  background:#f2b9b9;
+  color:#762626;
+}
+
+.event-bar.vacation {
+  background:#b8d0f5;
+  color:#234c87;
+}
+
+.event-bar.school {
+  background:#b9dfc5;
+  color:#205c36;
+}
+
+.event-bar.other {
+  background:#d5c1eb;
+  color:#553477;
+}
+
+.event-bar.normal {
+  background:#d7dce5;
+  color:#414d60;
+}
+
+body[data-theme="dark"] .event-bar.exam {
+  background:#713d47;
+  color:#ffe0e0;
+}
+
+body[data-theme="dark"] .event-bar.vacation {
+  background:#304e78;
+  color:#dceaff;
+}
+
+body[data-theme="dark"] .event-bar.school {
+  background:#315d45;
+  color:#d9f7e2;
+}
+
+body[data-theme="dark"] .event-bar.other {
+  background:#59436e;
+  color:#f0e1ff;
+}
+
+body[data-theme="dark"] .event-bar.normal {
+  background:#414d60;
+  color:#edf1f7;
+}
+
+/* 하루짜리 일정 표시 */
+.single-event-markers {
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+  align-items:stretch;
+  margin-top:2px;
+  padding:0 2px;
+}
+
+.single-marker {
+  display:block;
+  height:5px;
+  border-radius:5px;
+}
+
+.single-marker.exam { background:var(--red); }
+.single-marker.vacation { background:var(--blue); }
+.single-marker.school { background:var(--green); }
+.single-marker.other { background:var(--purple); }
+.single-marker.normal { background:#9aa5b5; }
+
+.day-count {
+  display:block;
+  font-size:9px;
+  color:var(--muted);
+  margin-top:2px;
+}
+
+.calendar-legend {
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px 13px;
+  margin-top:14px;
+  font-size:11px;
+  color:var(--muted);
+}
+
+.legend-item {
+  display:flex;
+  align-items:center;
+  gap:4px;
+}
+
+.legend-dot {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+}
+
+/* 날짜 상세 패널 */
+.date-detail-panel {
+  background:var(--panel);
+  border:1px solid var(--border);
+  border-radius:13px;
+  padding:17px;
+  min-width:0;
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+}
+
+.detail-date-label {
+  color:var(--blue);
+  font-size:12px;
+  font-weight:700;
+  margin-bottom:5px;
+}
+
+.detail-date {
+  font-size:23px;
+  font-weight:800;
+  color:var(--navy);
+  line-height:1.4;
+  margin-bottom:4px;
+}
+
+.detail-weekday {
+  color:var(--muted);
+  font-size:13px;
+  padding-bottom:13px;
+  border-bottom:1px solid var(--border);
+}
+
+.detail-event-list {
+  display:grid;
+  gap:11px;
+  margin-top:14px;
+}
+
+.detail-event {
+  background:var(--card);
+  border:1px solid var(--border);
+  border-left:4px solid var(--purple);
+  border-radius:9px;
+  padding:11px;
+}
+
+.detail-event.exam { border-left-color:var(--red); }
+.detail-event.vacation { border-left-color:var(--blue); }
+.detail-event.school { border-left-color:var(--green); }
+.detail-event.other { border-left-color:var(--purple); }
+
+.detail-event-name {
+  font-size:14px;
+  font-weight:800;
+  overflow-wrap:anywhere;
+}
+
+.detail-event-date {
+  font-size:11px;
+  color:var(--muted);
+  margin-top:3px;
+}
+
+.detail-event-content {
+  font-size:12px;
+  color:var(--muted);
+  margin-top:7px;
+  white-space:pre-line;
+  overflow-wrap:anywhere;
+}
+
+.detail-empty {
+  background:var(--card);
+  border:1px dashed var(--border);
+  padding:20px 10px;
+  text-align:center;
+  color:var(--muted);
+  font-size:13px;
+  border-radius:10px;
+  margin-top:14px;
+}
+
+/* 다가오는 일정 */
+.upcoming-list {
+  display:grid;
+  gap:10px;
+}
+
+.upcoming-item {
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:var(--card);
+  color:var(--text);
+  padding:12px;
+  text-align:left;
+  cursor:pointer;
+  font:inherit;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+
+.upcoming-item:hover {
+  background:var(--light-blue);
+  border-color:#b9cbea;
+}
+
+.upcoming-info { min-width:0; }
+
+.upcoming-date {
+  font-size:11px;
+  color:var(--muted);
+}
+
+.upcoming-name {
+  font-size:14px;
+  font-weight:700;
+  overflow-wrap:anywhere;
+}
+
+.dday {
+  flex-shrink:0;
+  font-size:12px;
+  font-weight:700;
+  color:var(--red);
+  background:var(--light-blue);
+  border-radius:20px;
+  padding:4px 9px;
+}
+
+.status {
+  border-radius:10px;
+  background:var(--panel);
+  color:var(--muted);
+  padding:13px;
+  font-size:13px;
+  white-space:pre-line;
+  overflow-wrap:anywhere;
+}
+
+.status.error {
+  background:#fff3f1;
+  color:#9b3429;
+}
+
+.status.success {
+  background:#eef8f0;
+  color:#27643a;
+}
+
+body[data-theme="dark"] .status.error {
+  background:#492d32;
+  color:#ffc4c4;
+}
+
+body[data-theme="dark"] .status.success {
+  background:#294434;
+  color:#c4f0d0;
+}
+
+[hidden] { display:none !important; }
+
+/* 주간 달력 */
+.week-navigation { margin-bottom:18px; }
+
+.week-navigation h2 { font-size:17px; }
+
+.calendar-grid.week-grid { gap:7px; }
+
+.calendar-day {
+  border:1px solid var(--border);
+  border-radius:11px;
+  background:var(--card);
+  min-height:75px;
+  padding:9px 4px;
+  text-align:center;
+  cursor:pointer;
+  color:var(--text);
+  font:inherit;
+}
+
+.calendar-day:hover {
+  background:var(--light-blue);
+  border-color:var(--blue);
+}
+
+.calendar-day .day-name {
+  display:block;
+  color:var(--muted);
+  font-size:12px;
+}
+
+.calendar-day .day-number {
+  display:block;
+  font-size:18px;
+  font-weight:700;
+}
+
+.calendar-day.today {
+  border:2px solid var(--blue);
+  background:var(--light-blue);
+}
+
+.calendar-day.selected {
+  background:#233b63;
+  border-color:#233b63;
+  color:white;
+}
+
+.calendar-day.selected .day-name { color:#d5e1f5; }
+
+.calendar-guide {
+  margin-top:12px;
+  color:var(--muted);
+  font-size:12px;
+}
+
+/* 주간 시간표 */
+.week-title p {
+  margin:-8px 0 14px;
+  font-size:13px;
+  color:var(--muted);
+}
+
+.weekly-table-wrap { overflow-x:auto; }
+
+.weekly-table {
+  width:100%;
+  border-collapse:collapse;
+  table-layout:fixed;
+}
+
+.weekly-table th,
+.weekly-table td {
+  border:1px solid var(--border);
+  padding:11px 6px;
+  text-align:center;
+  vertical-align:middle;
+  font-size:12px;
+  overflow-wrap:anywhere;
+}
+
+.weekly-table th {
+  background:var(--panel);
+  color:var(--navy);
+}
+
+.weekly-table th:first-child,
+.weekly-table td:first-child {
+  width:65px;
+  background:var(--panel);
+  font-weight:700;
+}
+
+.weekly-table td {
+  min-height:55px;
+  background:var(--card);
+}
+
+.weekly-table td.selected-column,
+.weekly-table th.selected-column {
+  background:var(--light-blue);
+}
+
+.subject-name {
+  display:block;
+  font-weight:600;
+  line-height:1.5;
+}
+
+.empty-cell { color:var(--muted); }
+
+.timetable-change {
+  display:block;
+  margin-top:5px;
+  padding:5px 4px;
+  border-radius:6px;
+  background:#fff0e8;
+  border:1px solid #f0b38e;
+  color:#a94319;
+  font-size:11px;
+  font-weight:800;
+}
+
+.timetable-makeup {
+  background:#f1eaff;
+  border-color:#c8b0ed;
+  color:#69429b;
+}
+
+.timetable-replacement {
+  background:#e8f5ee;
+  border-color:#9ac9ac;
+  color:#287044;
+}
+
+footer {
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.9;
+  padding:8px 2px 24px;
+}
+
+footer strong { color:var(--text); }
+
+@media(max-width:850px) {
+  .top-dashboard { grid-template-columns:1fr; }
+  .month-detail-layout { grid-template-columns:1fr; }
+  .date-detail-panel { min-height:220px; }
+}
+
+@media(max-width:760px) {
+  .container {
+    width:min(100% - 20px,1250px);
+    padding-top:14px;
+  }
+
+  .hero {
+    padding:22px 18px;
+    border-radius:14px;
+  }
+
+  .card { padding:17px 12px; }
+
+  .month-week {
+    grid-template-rows:68px repeat(var(--lane-count),13px);
+    gap:3px 2px;
+  }
+
+  .month-day { padding:5px 1px; }
+  .month-day .number { font-size:12px; }
+
+  .event-bar {
+    height:11px;
+    line-height:11px;
+    font-size:7px;
+    padding:0 2px;
+  }
+
+  .calendar-day { min-height:65px; }
+
+  .weekly-table { min-width:650px; }
+
+  .week-navigation h2 { font-size:14px; }
+
+  .nav-button {
+    padding:7px 9px;
+    font-size:12px;
+  }
+
+  .detail-date { font-size:21px; }
+
+  .theme-button {
+    padding:8px 10px;
+    font-size:12px;
+  }
+}
+</style>
+
+<style>
+.ols-table-wrap{overflow:auto;max-width:100%;border:2px solid #98764d;background:#f8edcf}
+.ols-week-table{border-collapse:collapse;width:100%;min-width:650px;color:#493724;font:12px/1.45 monospace}
+.ols-week-table th,.ols-week-table td{border:1px solid #c3a77a;padding:8px 6px;text-align:center;vertical-align:middle}
+.ols-week-table th{background:#d9c393}
+.ols-week-table td{cursor:pointer;background:#fff7e3}
+.ols-week-table .selected{background:#dce5bd}
+.ols-week-table td span{display:block}
+.ols-week-table small{display:block;color:#8b573b}
+.ols-month-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin:12px 0}
+.ols-month-grid>b{text-align:center;padding:5px;color:#715333}
+.ols-month-day{min-height:48px;border:1px solid #b99a6a;background:#fff4d8;color:#493724;font:13px monospace;cursor:pointer}
+.ols-month-day.selected{background:#cbd9a7;border:2px solid #66814e}
+.ols-month-day.today{outline:2px solid #a66a48}
+.ols-month-day i{display:block;font-size:9px;color:#806341;font-style:normal}
+.ols-date-events{border-top:2px solid #b99a6a;padding-top:8px}
+.ols-date-events h3{font: bold 15px monospace}
+.ols-date-events article,.ols-dday-item{padding:9px;margin:7px 0;background:#f8edcf;border:1px solid #c6a875}
+.ols-date-events p{margin:5px 0;font-size:12px;white-space:pre-wrap}
+.ols-dday-item{display:flex;width:100%;text-align:left;justify-content:space-between;align-items:center;gap:10px;color:#493724;cursor:pointer;font:12px monospace}
+.ols-dday-item b{display:block;margin-top:4px}
+.ols-dday-item strong{font-size:16px;color:#8a493b;white-space:nowrap}
+</style>
+
+<style>
+.ols-stage{border:7px solid #6b4932;box-shadow:0 0 0 2px #e4c58b,0 14px 34px #07110fbb}
+.ols-avatar-choice{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;min-height:142px;background:linear-gradient(135deg,#fff1d1,#dfc18d);box-shadow:inset 0 0 0 3px #fff8df,3px 4px #6b4a30}
+.ols-avatar-choice canvas{width:72px;height:88px;image-rendering:pixelated}
+.ols-avatar-choice.selected{background:linear-gradient(135deg,#e9f0cb,#c6d49c);outline:3px solid #78945d}
+</style>
+
+<style>
+.ols-meal-slip{background:#fff3d5;border:3px solid #9a7045;padding:13px 15px;margin:12px 0;box-shadow:inset 0 0 0 2px #ead4a5,3px 4px #9a704533;color:#493724}
+.ols-meal-slip header{display:flex;justify-content:space-between;gap:8px;border-bottom:2px dashed #c2a477;padding-bottom:8px;font: bold 14px monospace}
+.ols-meal-slip ul{margin:10px 0;padding-left:20px;font:13px/1.8 monospace}
+.ols-meal-slip footer{border-top:1px solid #d7c29b;padding-top:7px;font:11px monospace;color:#755b3d}
+#ols-canvas{cursor:crosshair}
+.ols-toast{max-width:90%;text-align:center}
+</style>
+
+<style>
+#ols-title-screen{background:#172b24ee;z-index:100}
+.ols-title-card{width:min(760px,94vw);overflow:hidden;border:8px solid #68472f;background:#f2dfb5;box-shadow:0 0 0 3px #d9bd82,0 20px 60px #0009}
+.ols-title-art{height:270px;position:relative;overflow:hidden;background:linear-gradient(#92c7d0 0 58%,#8cb36a 58% 100%);image-rendering:pixelated}
+.ols-title-sun{position:absolute;right:90px;top:35px;width:58px;height:58px;background:#f7dc91;box-shadow:0 0 0 9px #f7dc9133}
+.ols-title-cloud{position:absolute;height:13px;width:85px;background:#e9ead3;box-shadow:18px -10px #e9ead3,42px -5px #e9ead3}
+.cloud-a{left:65px;top:55px}.cloud-b{right:90px;top:105px;transform:scale(.7)}
+.ols-title-school{position:absolute;left:50%;bottom:45px;transform:translateX(-50%);width:310px;height:145px}
+.ols-title-roof{position:absolute;left:-17px;top:0;width:344px;height:42px;background:#75483c;clip-path:polygon(10% 100%,50% 0,90% 100%)}
+.ols-title-facade{position:absolute;left:0;bottom:0;width:310px;height:112px;background:#d7b98a;border:7px solid #8b6042;box-shadow:inset 0 0 0 5px #ecd9b2}
+.ols-title-facade i{display:inline-block;width:34px;height:48px;margin:17px 7px 0;background:#79aeb4;border:5px solid #765038;box-shadow:inset 0 0 0 3px #c9d9c4}
+.ols-title-facade b{position:absolute;bottom:0;left:126px;width:48px;height:69px;background:#79513a;border:5px solid #e8d4ac}
+.ols-title-trees{position:absolute;bottom:32px;left:8%;width:84%;display:flex;justify-content:space-between}
+.ols-title-trees i{width:48px;height:63px;background:#477b46;box-shadow:0 -17px #5b8b4b,12px -27px #3c6d40,20px 7px #315a3a}
+.ols-title-path{position:absolute;bottom:-35px;left:42%;width:16%;height:105px;background:#c6aa7c;transform:perspective(90px) rotateX(12deg)}
+.ols-title-copy{padding:18px 20px 24px;text-align:center;color:#493522;background:repeating-linear-gradient(0deg,#f2dfb5,#f2dfb5 8px,#eed9ad 8px,#eed9ad 10px)}
+.ols-title-kicker{font:10px monospace;letter-spacing:2px;color:#80613e}
+.ols-title-copy h1{font:bold clamp(23px,5vw,36px) monospace;color:#526e49;text-shadow:2px 2px #e0c68f;margin:8px 0}
+.ols-title-copy p{font: bold 14px monospace;margin:10px}
+.ols-title-enter{font-size:15px;padding:12px 24px;background:#d9bd82}
+.ols-meal-empty p{font:12px/1.7 monospace}
+@media(max-width:600px){.ols-title-art{height:210px}.ols-title-school{transform:translateX(-50%) scale(.78);transform-origin:bottom center}.ols-title-copy{padding:14px 10px}}
+</style>
+</head>
+
+<body>
+
+<style>
+/* OUR LITTLE SCHOOL game layer */
+body { background:#172b2a !important; }
+body > main.container { display:none !important; }
+#ols-game { min-height:100vh; color:#f8efd7; font-family:monospace; padding:14px; }
+.ols-shell { width:min(1120px,100%); margin:0 auto; }
+.ols-top { display:flex; justify-content:space-between; align-items:center; gap:12px; margin:0 0 10px; flex-wrap:wrap; }
+.ols-logo { font-weight:900; letter-spacing:2px; color:#f5d994; text-shadow:2px 2px #4b3528; font-size:clamp(18px,3vw,27px); }
+.ols-sub { color:#d5c9a8; font-size:12px; margin-top:3px; }
+.ols-hud { display:flex; gap:7px; align-items:center; flex-wrap:wrap; }
+.ols-btn { border:3px solid #6c4b32; background:#e9d5a5; color:#493522; padding:8px 11px; font: bold 12px monospace; box-shadow:inset 0 0 0 2px #fff0c8, 2px 3px #091817; cursor:pointer; }
+.ols-btn:active { transform:translate(1px,2px); box-shadow:inset 0 0 0 2px #fff0c8,1px 1px #091817; }
+.ols-stage { position:relative; border:6px solid #795538; background:#243d35; box-shadow:0 0 0 3px #d2b47b, 0 12px 30px #0008; overflow:hidden; }
+#ols-canvas { display:block; width:100%; height:auto; aspect-ratio: 16 / 10; image-rendering:pixelated; image-rendering:crisp-edges; }
+.ols-hint { padding:10px 12px; margin-top:10px; background:#263d35; border:2px solid #61745a; color:#e7dfc4; font-size:12px; line-height:1.8; }
+.ols-toast { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); background:#18251fdd; border:2px solid #e5d4a7; padding:8px 12px; color:#fff4d5; font-size:12px; white-space:nowrap; pointer-events:none; }
+.ols-overlay { position:fixed; inset:0; z-index:20; display:flex; align-items:center; justify-content:center; padding:16px; background:#101c1bd9; }
+.ols-panel { width:min(620px,100%); max-height:85vh; overflow:auto; background:#e8d5a9; color:#493724; border:6px solid #795538; box-shadow:0 0 0 3px #f6e7c2,0 15px 40px #0009; padding:18px; }
+.ols-panel h2 { margin:0 0 12px; font: bold 21px monospace; color:#65442c; }
+.ols-panel p { font:14px/1.7 monospace; }
+.ols-choice { display:flex; gap:12px; justify-content:center; margin:18px 0; flex-wrap:wrap; }
+.ols-avatar-choice { border:3px solid #8b6944; background:#f6e8c8; padding:12px 20px; min-width:130px; cursor:pointer; font:bold 14px monospace; color:#493724; }
+.ols-avatar-choice.selected { outline:4px solid #78945d; }
+.ols-dialogue { position:fixed; z-index:30; left:50%; bottom:20px; transform:translateX(-50%); width:min(850px,calc(100% - 24px)); background:#111b19; border:5px solid #c9a66a; box-shadow:inset 0 0 0 3px #59452f,0 8px 30px #0009; padding:15px 18px; color:#fff3d5; font:16px/1.6 monospace; }
+.ols-dialogue strong { display:block; color:#f4d58e; margin-bottom:5px; }
+.ols-modal-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin:10px 0; }
+.ols-periods { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:8px; }
+.ols-period { text-align:left; background:#f7e9c9; border:2px solid #ad8c5d; padding:9px; color:#493724; cursor:pointer; font:12px/1.5 monospace; }
+.ols-period.active { background:#cbd9a7; border-color:#617c4c; }
+.ols-small { font-size:11px; color:#715a3c; }
+.ols-hidden { display:none !important; }
+.ols-touch { display:none; position:absolute; bottom:12px; left:12px; right:12px; justify-content:space-between; pointer-events:none; }
+.ols-pad { display:grid; grid-template-columns:repeat(3,42px); grid-template-rows:repeat(2,42px); gap:4px; pointer-events:auto; }
+.ols-pad button,.ols-action { border:2px solid #e5d2a4; background:#1b2b25d9; color:white; font:bold 17px monospace; border-radius:5px; touch-action:none; }
+.ols-action { align-self:end; width:58px; height:58px; font-size:12px; }
+@media(max-width:700px) {
+ #ols-game { padding:8px; }
+ .ols-top { align-items:flex-start; }
+ .ols-hud { width:100%; }
+ .ols-btn { padding:7px 8px; font-size:11px; }
+ .ols-hint { font-size:11px; }
+ .ols-touch { display:flex; }
+ .ols-dialogue { bottom:8px; font-size:13px; padding:11px; }
+}
+</style>
+
+
+<div id="ols-game">
+ <div class="ols-shell">
+  <div class="ols-top">
+   <div><div class="ols-logo">OUR LITTLE SCHOOL</div><div class="ols-sub">A little adventure in our school life.</div></div>
+   <div class="ols-hud">
+    <button class="ols-btn" id="ols-date-prev">◀ 날짜</button>
+    <button class="ols-btn" id="ols-date-today">오늘</button>
+    <button class="ols-btn" id="ols-date-next">날짜 ▶</button>
+    <span class="ols-btn" id="ols-date-label">날짜 불러오는 중</span>
+    <button class="ols-btn" id="ols-home">시작화면으로</button>
+    <button class="ols-btn" id="ols-character">캐릭터 선택</button>
+    <button class="ols-btn" id="ols-help">조작 안내</button>
+   </div>
+  </div>
+  <div class="ols-stage">
+   <canvas id="ols-canvas" width="960" height="600" aria-label="OUR LITTLE SCHOOL 픽셀 RPG 게임 화면"></canvas>
+   <div class="ols-toast" id="ols-toast">WASD 또는 방향키로 이동하세요 · E 상호작용</div>
+   <div class="ols-touch" id="ols-touch">
+    <div class="ols-pad">
+     <span></span><button data-key="ArrowUp">▲</button><span></span>
+     <button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
+    </div>
+    <button class="ols-action" id="ols-touch-action">우클릭<br>사용</button>
+   </div>
+  </div>
+  <div class="ols-hint">이동 <b>W A S D / 방향키</b> · 상호작용 <b>마우스 우클릭</b> · 대화/메뉴 닫기 <b>ESC</b> · 모바일은 화면의 상호작용 버튼을 사용하세요.</div>
+ </div>
+</div>
+<div class="ols-overlay" id="ols-title-screen">
+ <div class="ols-title-card">
+  <div class="ols-title-sky"></div>
+  <div class="ols-title-art">
+   <div class="ols-title-sun"></div>
+   <div class="ols-title-cloud cloud-a"></div><div class="ols-title-cloud cloud-b"></div>
+   <div class="ols-title-school"><div class="ols-title-roof"></div><div class="ols-title-facade"><i></i><i></i><i></i><i></i><b></b></div></div>
+   <div class="ols-title-trees"><i></i><i></i><i></i></div>
+   <div class="ols-title-path"></div>
+  </div>
+  <div class="ols-title-copy">
+   <div class="ols-title-kicker">A LITTLE ADVENTURE IN OUR SCHOOL LIFE</div>
+   <h1>OUR LITTLE SCHOOL</h1>
+   <p>한영외국어고등학교로 등교하시겠습니까?</p>
+   <button class="ols-btn ols-title-enter" id="ols-enter-school">등교하기　▶</button>
+  </div>
+ </div>
+</div>
+<div class="ols-overlay ols-hidden" id="ols-start">
+ <div class="ols-panel" style="text-align:center">
+  <div style="font-size:12px;letter-spacing:3px">WELCOME TO</div>
+  <h2 style="font-size:30px;margin:8px 0">OUR LITTLE SCHOOL</h2>
+  <p>작은 학교의 하루를 탐험해 보세요.</p>
+  <p><b>플레이어 캐릭터를 선택하세요.</b></p>
+  <div class="ols-choice">
+   <button class="ols-avatar-choice selected" data-gender="boy"><canvas id="ols-boy-preview" width="72" height="88"></canvas><br>남학생</button>
+   <button class="ols-avatar-choice" data-gender="girl"><canvas id="ols-girl-preview" width="72" height="88"></canvas><br>여학생</button>
+  </div>
+  <button class="ols-btn" id="ols-start-btn">게임 시작</button>
+  <p class="ols-small">캐릭터는 한영외고 교복을 모티브로 한 오리지널 픽셀 캐릭터입니다.</p>
+ </div>
+</div>
+<div class="ols-overlay ols-hidden" id="ols-panel-overlay">
+ <div class="ols-panel">
+  <div class="ols-modal-row" style="justify-content:space-between"><h2 id="ols-panel-title">안내</h2><button class="ols-btn" id="ols-panel-close">닫기 ✕</button></div>
+  <div id="ols-panel-content"></div>
+ </div>
+</div>
+<div class="ols-dialogue ols-hidden" id="ols-dialogue"><strong id="ols-speaker"></strong><span id="ols-dialogue-text"></span><div style="text-align:right;margin-top:8px"><button class="ols-btn" id="ols-dialogue-close">확인</button></div></div>
+
+<main class="container">
+
+<header class="hero">
+  <div class="hero-top">
+    <div>
+      <div class="school-label">SCHOOL DASHBOARD · NEIS OPEN API</div>
+      <h1>한영외국어고등학교<br>시간표·학사일정 알리미</h1>
+      <p>월간 일정과 주간 시간표를 한눈에 확인하세요.</p>
+      <div class="class-badge">2026학년도 · 2학년 6반</div>
+    </div>
+
+    <button type="button" class="theme-button" id="themeToggle">
+      🌙 다크 모드
+    </button>
+  </div>
+</header>
+
+<section class="top-dashboard">
+
+  <div class="card">
+    <div class="month-navigation">
+      <button class="nav-button" id="prevMonth" type="button">←</button>
+      <h2 id="monthTitle">2026년 11월</h2>
+      <button class="nav-button" id="nextMonth" type="button">→</button>
+    </div>
+
+    <div class="month-detail-layout">
+      <div class="month-calendar-area">
+        <div class="calendar-grid" id="monthCalendar"></div>
+
+        <div class="calendar-legend">
+          <span class="legend-item"><i class="legend-dot" style="background:#c64d4d"></i>시험</span>
+          <span class="legend-item"><i class="legend-dot" style="background:#456ca8"></i>방학</span>
+          <span class="legend-item"><i class="legend-dot" style="background:#39845a"></i>개학·종업식</span>
+          <span class="legend-item"><i class="legend-dot" style="background:#7954a5"></i>기타 주요 일정</span>
+        </div>
+      </div>
+
+      <aside class="date-detail-panel" aria-live="polite">
+        <div class="detail-date-label">SELECTED DATE</div>
+        <div class="detail-date" id="detailDate">날짜</div>
+        <div class="detail-weekday" id="detailWeekday"></div>
+        <div class="detail-event-list" id="detailEventList">
+          <div class="detail-empty">학사일정을 불러오는 중입니다.</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>다가오는 주요 일정</h2>
+    <div id="upcomingStatus" class="status">
+      주요 일정을 불러오는 중입니다.
+    </div>
+    <div id="upcomingList" class="upcoming-list" hidden></div>
+  </div>
+
+</section>
+
+<section class="card">
+  <div class="week-navigation">
+    <button type="button" class="nav-button" id="prevWeek">← 이전 주</button>
+    <h2 id="weekRange">주간 달력</h2>
+    <button type="button" class="nav-button" id="nextWeek">다음 주 →</button>
+  </div>
+
+  <div class="calendar-grid week-grid" id="weekCalendar"></div>
+
+  <div class="calendar-guide">
+    파란색 테두리: 오늘 · 남색 배경: 선택한 날짜
+  </div>
+</section>
+
+<section class="card">
+  <h2>주간 시간표</h2>
+  <p class="week-title" id="timetableWeekLabel"></p>
+
+  <div id="timetableStatus" class="status" role="status" aria-live="polite">
+    시간표를 불러오는 중입니다.
+  </div>
+
+  <div class="weekly-table-wrap" id="timetableContent" hidden>
+    <table class="weekly-table">
+      <thead id="weeklyTableHead"></thead>
+      <tbody id="weeklyTableBody"></tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:12px;font-size:12px;color:#8b5a34">
+    ※ 변경·보강 표시는 API 원자료에 해당 정보가 확인되는 경우에만 표시됩니다.
+  </div>
+</section>
+
+<footer>
+  <strong>데이터 출처</strong>: 교육부 NEIS 교육정보 개방 포털<br>
+  <strong>조회 대상</strong>: 한영외국어고등학교 2학년 6반<br>
+  <strong>조회 기준</strong>: 2026학년도<br>
+  시간표와 학사일정은 NEIS 등록 내용 및 갱신 시점에 따라 실제 학교 운영 정보와 차이가 있을 수 있습니다.
+</footer>
+
+</main>
+
+<script>
+/* ==========================================
+   1. NEIS API 기본 설정
+========================================== */
+
+const API_KEY = "3a59a7035d4b4193a466d89f544099b2";
+const OFFICE_CODE = "B10";
+const SCHOOL_CODE = "7010259";
+const SCHOOL_YEAR = "2026";
+const GRADE = "2";
+const CLASS_NUMBER = "6";
+
+const TIMETABLE_API = "https://open.neis.go.kr/hub/hisTimetable";
+const SCHEDULE_API = "https://open.neis.go.kr/hub/SchoolSchedule";
+const MEAL_API = "https://open.neis.go.kr/hub/mealServiceDietInfo";
+let mealCache = new Map();
+let mealRequestToken = 0;
+
+/* ==========================================
+   2. 화면 요소
+========================================== */
+
+const monthCalendar = document.getElementById("monthCalendar");
+const monthTitle = document.getElementById("monthTitle");
+const weekCalendar = document.getElementById("weekCalendar");
+
+const timetableStatus = document.getElementById("timetableStatus");
+const timetableContent = document.getElementById("timetableContent");
+const weeklyTableHead = document.getElementById("weeklyTableHead");
+const weeklyTableBody = document.getElementById("weeklyTableBody");
+const timetableWeekLabel = document.getElementById("timetableWeekLabel");
+
+const upcomingStatus = document.getElementById("upcomingStatus");
+const upcomingList = document.getElementById("upcomingList");
+
+const detailDate = document.getElementById("detailDate");
+const detailWeekday = document.getElementById("detailWeekday");
+const detailEventList = document.getElementById("detailEventList");
+
+/* ==========================================
+   3. 라이트 모드 / 다크 모드
+========================================== */
+
+const themeToggle = document.getElementById("themeToggle");
+
+function applyTheme(theme) {
+  document.body.dataset.theme = theme;
+
+  const dark = theme === "dark";
+
+  themeToggle.textContent = dark
+    ? "☀️ 라이트 모드"
+    : "🌙 다크 모드";
+
+  try {
+    localStorage.setItem("schoolDashboardTheme",theme);
+  } catch(error) {
+    console.warn("테마 설정을 저장하지 못했습니다.",error);
+  }
+}
+
+function initializeTheme() {
+  let savedTheme = "light";
+
+  try {
+    savedTheme =
+      localStorage.getItem("schoolDashboardTheme") || "light";
+  } catch(error) {
+    console.warn("저장된 테마를 읽지 못했습니다.",error);
+  }
+
+  applyTheme(savedTheme);
+}
+
+themeToggle.addEventListener("click",()=>{
+  const nextTheme =
+    document.body.dataset.theme === "dark" ? "light" : "dark";
+
+  applyTheme(nextTheme);
+});
+
+/* ==========================================
+   4. 날짜 함수
+========================================== */
+
+function dateToString(date) {
+  const y = date.getFullYear();
+  const m = String(date.getMonth()+1).padStart(2,"0");
+  const d = String(date.getDate()).padStart(2,"0");
+  return `${y}-${m}-${d}`;
+}
+
+function toApiDate(dateString) {
+  return dateString.replaceAll("-","");
+}
+
+function formatApiDate(value) {
+  if(!value || !/^\d{8}$/.test(value)) {
+    return value || "날짜 정보 없음";
+  }
+
+  return `${value.slice(0,4)}.${value.slice(4,6)}.${value.slice(6,8)}`;
+}
+
+function parseDate(value) {
+  const [y,m,d] = value.split("-").map(Number);
+  return new Date(y,m-1,d);
+}
+
+function getMonday(date) {
+  const result = new Date(date.getFullYear(),date.getMonth(),date.getDate());
+  const day = result.getDay();
+  result.setDate(result.getDate()+(day===0?-6:1-day));
+  return result;
+}
+
+function addDays(date,amount) {
+  const result = new Date(date);
+  result.setDate(result.getDate()+amount);
+  return result;
+}
+
+function dateDifference(from,to) {
+  const a = Date.UTC(from.getFullYear(),from.getMonth(),from.getDate());
+  const b = Date.UTC(to.getFullYear(),to.getMonth(),to.getDate());
+  return Math.round((b-a)/86400000);
+}
+
+function getWeekday(dateString) {
+  const date = parseDate(dateString);
+  return ["일요일","월요일","화요일","수요일","목요일","금요일","토요일"][date.getDay()];
+}
+
+/* ==========================================
+   5. 상태 관리
+========================================== */
+
+const today = dateToString(new Date());
+
+let selectedDate = today;
+let currentWeekStart = getMonday(parseDate(today));
+
+let displayedMonth = new Date(
+  parseDate(today).getFullYear(),
+  parseDate(today).getMonth(),
+  1
+);
+
+let weeklyTimetable = {};
+let monthlyEvents = [];
+let upcomingEvents = [];
+
+let timetableRequestId = 0;
+let monthRequestId = 0;
+let upcomingRequestId = 0;
+
+let loadedMonthKey = "";
+
+const dayNames = ["월","화","수","목","금","토","일"];
+
+/* ==========================================
+   6. 공통 API 요청
+========================================== */
+
+async function requestNeis(apiUrl,params) {
+  const query = new URLSearchParams(params);
+  const response = await fetch(`${apiUrl}?${query.toString()}`);
+
+  if(!response.ok) {
+    throw new Error(`HTTP 오류: ${response.status}`);
+  }
+
+  return response.json();
+}
+
+function getRows(data,serviceName) {
+  if(data.RESULT) {
+    const code = data.RESULT.CODE || "";
+    const message = data.RESULT.MESSAGE || "";
+
+    if(code==="INFO-200") return [];
+
+    if(code && code!=="INFO-000") {
+      throw new Error(`${code}: ${message}`);
+    }
+  }
+
+  const serviceData = data[serviceName];
+
+  if(!Array.isArray(serviceData)) {
+    throw new Error(`${serviceName} 응답 형식을 확인할 수 없습니다.`);
+  }
+
+  for(const part of serviceData) {
+    if(part && Array.isArray(part.row)) {
+      return part.row;
+    }
+  }
+
+  return [];
+}
+
+function getTotalCount(data,serviceName) {
+  const service = data[serviceName];
+  if(!Array.isArray(service)) return null;
+
+  const countInfo = service.find(item=>item && Array.isArray(item.head));
+  const countRow = countInfo?.head?.find(
+    item=>item.list_total_count!==undefined
+  );
+
+  return countRow ? Number(countRow.list_total_count) : null;
+}
+
+function cleanText(value) {
+  return String(value ?? "")
+    .replace(/<br\s*\/?>/gi,"\n")
+    .trim();
+}
+
+function showStatus(element,message,type="") {
+  element.textContent = message;
+  element.className = "status";
+  if(type) element.classList.add(type);
+  element.hidden = false;
+}
+
+/* ==========================================
+   7. 학사일정 데이터 조회
+========================================== */
+
+async function fetchAllScheduleRows(fromDate,toDate) {
+  const fromApi = toApiDate(fromDate);
+  const toApi = toApiDate(toDate);
+
+  const allRows = [];
+  let page = 1;
+  let totalCount = Infinity;
+
+  while(allRows.length<totalCount) {
+    const params = {
+      KEY:API_KEY,
+      Type:"json",
+      pIndex:String(page),
+      pSize:"100",
+      ATPT_OFCDC_SC_CODE:OFFICE_CODE,
+      SD_SCHUL_CODE:SCHOOL_CODE,
+      AA_FROM_YMD:fromApi,
+      AA_TO_YMD:toApi
+    };
+
+    const data = await requestNeis(SCHEDULE_API,params);
+    const rows = getRows(data,"SchoolSchedule");
+
+    allRows.push(...rows);
+
+    const count = getTotalCount(data,"SchoolSchedule");
+    if(count!==null) totalCount = count;
+
+    if(rows.length===0 || rows.length<100) break;
+    page++;
+
+    if(page>50) break;
+  }
+
+  return allRows;
+}
+
+function getMonthKey(date) {
+  return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,"0")}`;
+}
+
+function getMonthRange() {
+  const year = displayedMonth.getFullYear();
+  const month = displayedMonth.getMonth();
+
+  const monthStart = new Date(year,month,1);
+  const monthEnd = new Date(year,month+1,0);
+
+  const todayDate = parseDate(today);
+  const upcomingEnd = addDays(todayDate,30);
+
+  const from = monthStart<todayDate ? monthStart : todayDate;
+  const to = monthEnd>upcomingEnd ? monthEnd : upcomingEnd;
+
+  return {
+    from:dateToString(from),
+    to:dateToString(to)
+  };
+}
+
+async function loadMonthEvents() {
+  const requestId = ++monthRequestId;
+  const monthKey = getMonthKey(displayedMonth);
+
+  showStatus(upcomingStatus,"학사일정을 불러오는 중입니다.");
+  upcomingList.hidden = true;
+
+  const range = getMonthRange();
+
+  try {
+    const rows = await fetchAllScheduleRows(range.from,range.to);
+
+    if(requestId!==monthRequestId) return;
+
+    monthlyEvents = removeDuplicateEvents(rows);
+    loadedMonthKey = monthKey;
+
+    renderMonthCalendar();
+    renderDateDetail();
+    renderUpcomingEvents();
+
+  } catch(error) {
+    if(requestId!==monthRequestId) return;
+
+    console.error("월간 학사일정 오류:",error);
+
+    monthlyEvents = [];
+    loadedMonthKey = "";
+
+    showStatus(
+      upcomingStatus,
+      `학사일정을 불러오지 못했습니다.\n${error.message}`,
+      "error"
+    );
+
+    renderMonthCalendar();
+    renderDateDetail();
+  }
+}
+
+/* ==========================================
+   8. 일정 날짜 및 분류
+========================================== */
+
+function eventStart(row) {
+  return row.AA_FROM_YMD || row.AA_YMD || "";
+}
+
+function eventEnd(row) {
+  return row.AA_TO_YMD || row.AA_YMD || "";
+}
+
+function eventDate(row) {
+  return eventStart(row);
+}
+
+function eventName(row) {
+  return cleanText(row.EVENT_NM) || "일정명 정보 없음";
+}
+
+function eventContent(row) {
+  return cleanText(row.EVENT_CNTNT);
+}
+
+function validApiDate(value) {
+  return /^\d{8}$/.test(value || "");
+}
+
+function dateStringFromApi(value) {
+  if(!validApiDate(value)) return "";
+  return `${value.slice(0,4)}-${value.slice(4,6)}-${value.slice(6,8)}`;
+}
+
+/* 토요휴업일 및 중복 일정 정리 */
+function normalizeEventName(name) {
+  return cleanText(name)
+    .replace(/\s*\(\s*휴업일\s*\)/g,"")
+    .replace(/\s+/g," ")
+    .trim();
+}
+
+function isSaturdayClosure(row) {
+  return /토요\s*휴업일/.test(eventName(row));
+}
+
+function removeDuplicateEvents(rows) {
+  const filtered = rows.filter(row=>!isSaturdayClosure(row));
+  const unique = new Map();
+
+  filtered.forEach(row=>{
+    const normalizedName = normalizeEventName(eventName(row));
+    const start = eventStart(row);
+    const end = eventEnd(row);
+
+    const key = `${normalizedName}|${start}|${end}`;
+
+    if(!unique.has(key)) {
+      unique.set(key,row);
+      return;
+    }
+
+    const previous = unique.get(key);
+
+    const previousIsHoliday = /휴업일/.test(eventName(previous));
+    const currentIsHoliday = /휴업일/.test(eventName(row));
+
+    /* 일반 일정명을 우선 남김 */
+    if(previousIsHoliday && !currentIsHoliday) {
+      unique.set(key,row);
+    }
+  });
+
+  return Array.from(unique.values());
+}
+
+function classifyEvent(row) {
+  const text = `${eventName(row)} ${eventContent(row)}`.toLowerCase();
+
+  if(/중간고사|기말고사|시험|고사|평가/.test(text)) {
+    return "exam";
+  }
+
+  if(/방학|휴업|휴일/.test(text)) {
+    return "vacation";
+  }
+
+  if(/개학|종업식|졸업식|입학식/.test(text)) {
+    return "school";
+  }
+
+  if(/축제|체육대회|수련회|수학여행|행사|연수/.test(text)) {
+    return "other";
+  }
+
+  return "normal";
+}
+
+function getEventsForDate(dateString) {
+  const apiDate = toApiDate(dateString);
+
+  return monthlyEvents.filter(row=>{
+    const start = eventStart(row);
+    const end = eventEnd(row);
+
+    if(validApiDate(start) && validApiDate(end)) {
+      return apiDate>=start && apiDate<=end;
+    }
+
+    return eventDate(row)===apiDate;
+  });
+}
+
+function getMajorEvents(rows=monthlyEvents) {
+  return rows.filter(row=>classifyEvent(row)!=="normal");
+}
+
+/* ==========================================
+   9. 여러 날 일정의 달력 막대 생성
+========================================== */
+
+function getEventsForCalendarRange(startDate,endDate) {
+  return monthlyEvents.filter(row=>{
+    const start = eventStart(row);
+    const end = eventEnd(row);
+
+    if(!validApiDate(start) || !validApiDate(end)) {
+      const single = eventDate(row);
+      return validApiDate(single) &&
+        single>=toApiDate(startDate) &&
+        single<=toApiDate(endDate);
+    }
+
+    return end>=toApiDate(startDate) &&
+      start<=toApiDate(endDate);
+  });
+}
+
+function getEventSegmentsForWeek(weekStart) {
+  const weekEnd = addDays(weekStart,6);
+  const weekStartString = dateToString(weekStart);
+  const weekEndString = dateToString(weekEnd);
+
+  const rows = getEventsForCalendarRange(
+    weekStartString,
+    weekEndString
+  );
+
+  const segments = [];
+
+  rows.forEach((row,index)=>{
+    const originalStart = validApiDate(eventStart(row))
+      ? dateStringFromApi(eventStart(row))
+      : dateStringFromApi(eventDate(row));
+
+    const originalEnd = validApiDate(eventEnd(row))
+      ? dateStringFromApi(eventEnd(row))
+      : originalStart;
+
+    if(!originalStart || !originalEnd) return;
+
+    const start = originalStart<weekStartString
+      ? weekStartString
+      : originalStart;
+
+    const end = originalEnd>weekEndString
+      ? weekEndString
+      : originalEnd;
+
+    if(start>end) return;
+
+    /* 하루짜리 일정은 막대 대신 날짜 안의 표시로 표현 */
+    if(originalStart===originalEnd) return;
+
+    segments.push({
+      row,
+      index,
+      start,
+      end,
+      originalStart,
+      originalEnd,
+      kind:classifyEvent(row)
+    });
+  });
+
+  segments.sort((a,b)=>{
+    if(a.start!==b.start) return a.start.localeCompare(b.start);
+    return b.end.localeCompare(a.end);
+  });
+
+  return segments;
+}
+
+function assignSegmentLanes(segments,weekStart) {
+  const lanes = [];
+
+  segments.forEach(segment=>{
+    const startIndex = dateDifference(
+      weekStart,
+      parseDate(segment.start)
+    );
+
+    const endIndex = dateDifference(
+      weekStart,
+      parseDate(segment.end)
+    );
+
+    let lane = 0;
+
+    while(lanes[lane]!==undefined && lanes[lane]>=startIndex) {
+      lane++;
+    }
+
+    lanes[lane] = endIndex;
+    segment.lane = lane;
+  });
+
+  return segments;
+}
+
+/* ==========================================
+   10. 월간 달력 렌더링
+========================================== */
+
+function renderMonthCalendar() {
+  monthCalendar.replaceChildren();
+
+  const year = displayedMonth.getFullYear();
+  const month = displayedMonth.getMonth();
+
+  monthTitle.textContent = `${year}년 ${month+1}월`;
+
+  dayNames.forEach(name=>{
+    const label = document.createElement("div");
+    label.className = "calendar-weekday";
+    label.textContent = name;
+    monthCalendar.appendChild(label);
+  });
+
+  const first = new Date(year,month,1);
+  const startOffset = (first.getDay()+6)%7;
+  const daysInMonth = new Date(year,month+1,0).getDate();
+  const totalCells = Math.ceil((startOffset+daysInMonth)/7)*7;
+
+  const firstVisibleDate = new Date(year,month,1-startOffset);
+  const visibleWeeks = totalCells/7;
+
+  for(let week=0;week<visibleWeeks;week++) {
+    const weekStart = addDays(firstVisibleDate,week*7);
+
+    const segments = assignSegmentLanes(
+      getEventSegmentsForWeek(weekStart),
+      weekStart
+    );
+
+    const weekWrapper = document.createElement("div");
+    weekWrapper.className = "month-week";
+
+    const laneCount = segments.length
+      ? Math.max(...segments.map(item=>item.lane))+1
+      : 0;
+
+    weekWrapper.style.setProperty("--lane-count",laneCount);
+
+    /* 날짜 셀 */
+    for(let day=0;day<7;day++) {
+      const date = addDays(weekStart,day);
+      const dateString = dateToString(date);
+
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "month-day";
+
+      if(date.getMonth()!==month) button.classList.add("outside");
+      if(dateString===today) button.classList.add("today");
+      if(dateString===selectedDate) button.classList.add("selected");
+
+      const number = document.createElement("span");
+      number.className = "number";
+      number.textContent = date.getDate();
+      button.appendChild(number);
+
+      const events = getEventsForDate(dateString);
+
+      const singleDayEvents = events.filter(row=>{
+        const start = eventStart(row);
+        const end = eventEnd(row);
+        return start===end || !validApiDate(end);
+      });
+
+      if(singleDayEvents.length>0) {
+        const markers = document.createElement("div");
+        markers.className = "single-event-markers";
+
+        singleDayEvents.slice(0,3).forEach(row=>{
+          const marker = document.createElement("span");
+          marker.className = `single-marker ${classifyEvent(row)}`;
+          marker.title = eventName(row);
+          markers.appendChild(marker);
+        });
+
+        button.appendChild(markers);
+      }
+
+      if(events.length>0) {
+        const count = document.createElement("span");
+        count.className = "day-count";
+        count.textContent = `${events.length}건`;
+        button.appendChild(count);
+      }
+
+      button.setAttribute(
+        "aria-label",
+        `${dateString}, 일정 ${events.length}건`
+      );
+
+      button.addEventListener("click",()=>{
+        selectDate(dateString,true);
+      });
+
+      weekWrapper.appendChild(button);
+    }
+
+    /* 여러 날 일정: 날짜 칸 사이를 이어주는 가로 막대 */
+    segments.forEach(segment=>{
+      const bar = document.createElement("span");
+      bar.className = `event-bar ${segment.kind}`;
+
+      const startIndex = dateDifference(
+        weekStart,
+        parseDate(segment.start)
+      ) + 1;
+
+      const endIndex = dateDifference(
+        weekStart,
+        parseDate(segment.end)
+      ) + 1;
+
+      bar.style.gridColumn = `${startIndex} / ${endIndex+1}`;
+      bar.style.gridRow = String(segment.lane+2);
+
+      const visibleStart = segment.start;
+      const visibleEnd = segment.end;
+
+      if(visibleStart===segment.originalStart) {
+        bar.classList.add("start");
+      }
+
+      if(visibleEnd===segment.originalEnd) {
+        bar.classList.add("end");
+      }
+
+      /* 주 경계에서 잘린 막대도 둥근 끝으로 표현 */
+      if(visibleStart!==segment.originalStart) {
+        bar.classList.add("start");
+      }
+
+      if(visibleEnd!==segment.originalEnd) {
+        bar.classList.add("end");
+      }
+
+      bar.textContent = eventName(segment.row);
+      bar.title = `${eventName(segment.row)} (${formatApiDate(eventStart(segment.row))} ~ ${formatApiDate(eventEnd(segment.row))})`;
+
+      weekWrapper.appendChild(bar);
+    });
+
+    monthCalendar.appendChild(weekWrapper);
+  }
+}
+
+/* ==========================================
+   11. 오른쪽 날짜 상세 패널
+========================================== */
+
+function renderDateDetail() {
+  detailDate.textContent = selectedDate.replaceAll("-",".");
+  detailWeekday.textContent = getWeekday(selectedDate);
+
+  detailEventList.replaceChildren();
+
+  if(!loadedMonthKey || loadedMonthKey!==getMonthKey(parseDate(selectedDate))) {
+    const message = document.createElement("div");
+    message.className = "detail-empty";
+    message.textContent = "학사일정을 불러오는 중입니다.";
+    detailEventList.appendChild(message);
+    return;
+  }
+
+  const events = getEventsForDate(selectedDate);
+
+  if(events.length===0) {
+    const message = document.createElement("div");
+    message.className = "detail-empty";
+    message.textContent = "등록된 학사일정이 없습니다.";
+    detailEventList.appendChild(message);
+    return;
+  }
+
+  events.forEach(row=>{
+    const kind = classifyEvent(row);
+
+    const item = document.createElement("article");
+    item.className = `detail-event ${kind}`;
+
+    const name = document.createElement("div");
+    name.className = "detail-event-name";
+    name.textContent = eventName(row);
+
+    const start = eventStart(row);
+    const end = eventEnd(row);
+
+    const dateLabel = document.createElement("div");
+    dateLabel.className = "detail-event-date";
+
+    if(validApiDate(start) && validApiDate(end) && start!==end) {
+      dateLabel.textContent =
+        `${formatApiDate(start)} ~ ${formatApiDate(end)}`;
+    } else {
+      dateLabel.textContent = formatApiDate(start || eventDate(row));
+    }
+
+    const content = document.createElement("div");
+    content.className = "detail-event-content";
+    content.textContent =
+      eventContent(row) || "상세 내용이 등록되어 있지 않습니다.";
+
+    item.append(name,dateLabel,content);
+    detailEventList.appendChild(item);
+  });
+}
+
+/* ==========================================
+   12. 월간 달력 이동
+========================================== */
+
+function changeMonth(amount) {
+  displayedMonth = new Date(
+    displayedMonth.getFullYear(),
+    displayedMonth.getMonth()+amount,
+    1
+  );
+
+  loadedMonthKey = "";
+  renderMonthCalendar();
+  renderDateDetail();
+  loadMonthEvents();
+}
+
+document.getElementById("prevMonth").addEventListener(
+  "click",()=>changeMonth(-1)
+);
+
+document.getElementById("nextMonth").addEventListener(
+  "click",()=>changeMonth(1)
+);
+
+/* ==========================================
+   13. 다가오는 주요 일정
+========================================== */
+
+async function loadUpcomingEvents() {
+  const requestId = ++upcomingRequestId;
+
+  const start = parseDate(today);
+  const end = addDays(start,30);
+
+  try {
+    const rows = await fetchAllScheduleRows(
+      dateToString(start),
+      dateToString(end)
+    );
+
+    if(requestId!==upcomingRequestId) return;
+
+    upcomingEvents = removeDuplicateEvents(rows);
+    renderUpcomingEvents();
+
+  } catch(error) {
+    if(requestId!==upcomingRequestId) return;
+
+    console.error("다가오는 일정 조회 오류:",error);
+
+    showStatus(
+      upcomingStatus,
+      `주요 일정을 불러오지 못했습니다.\n${error.message}`,
+      "error"
+    );
+  }
+}
+
+function renderUpcomingEvents() {
+  upcomingList.replaceChildren();
+
+  const now = parseDate(today);
+  const limit = addDays(now,30);
+
+  const events = getMajorEvents(upcomingEvents)
+    .filter(row=>{
+      const start = eventStart(row);
+      const end = eventEnd(row);
+
+      if(!validApiDate(start)) return false;
+
+      const startDate = parseDate(dateStringFromApi(start));
+      const endDate = validApiDate(end)
+        ? parseDate(dateStringFromApi(end))
+        : startDate;
+
+      return endDate>=now && startDate<=limit;
+    })
+    .sort((a,b)=>eventStart(a).localeCompare(eventStart(b)));
+
+  if(events.length===0) {
+    showStatus(
+      upcomingStatus,
+      "앞으로 한 달 동안 예정된 주요 일정이 없습니다."
+    );
+    return;
+  }
+
+  upcomingStatus.hidden = true;
+  upcomingList.hidden = false;
+
+  events.forEach(row=>{
+    const startValue = eventStart(row);
+    const endValue = eventEnd(row);
+
+    const startDate = parseDate(dateStringFromApi(startValue));
+    const dday = dateDifference(now,startDate);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "upcoming-item";
+
+    const info = document.createElement("div");
+    info.className = "upcoming-info";
+
+    const dateLabel = document.createElement("div");
+    dateLabel.className = "upcoming-date";
+
+    dateLabel.textContent =
+      validApiDate(endValue) && endValue!==startValue
+        ? `${formatApiDate(startValue)} ~ ${formatApiDate(endValue)}`
+        : formatApiDate(startValue);
+
+    const name = document.createElement("div");
+    name.className = "upcoming-name";
+    name.textContent = eventName(row);
+
+    info.append(dateLabel,name);
+
+    const badge = document.createElement("span");
+    badge.className = "dday";
+
+    if(dday<0) {
+      badge.textContent = "진행 중";
+    } else {
+      badge.textContent = dday===0 ? "D-DAY" : `D-${dday}`;
+    }
+
+    button.append(info,badge);
+
+    button.addEventListener("click",()=>{
+      const targetDate = dateStringFromApi(startValue);
+      selectDate(targetDate,true);
+    });
+
+    upcomingList.appendChild(button);
+  });
+}
+
+/* ==========================================
+   14. 날짜 선택 및 화면 동기화
+========================================== */
+
+function selectDate(dateString,fromMonthCalendar=false) {
+  selectedDate = dateString;
+
+  const date = parseDate(dateString);
+
+  displayedMonth = new Date(
+    date.getFullYear(),
+    date.getMonth(),
+    1
+  );
+
+  currentWeekStart = getMonday(date);
+
+  renderMonthCalendar();
+  renderWeekCalendar();
+  renderWeeklyTable();
+
+  if(fromMonthCalendar) {
+    if(loadedMonthKey===getMonthKey(date)) {
+      renderDateDetail();
+    } else {
+      loadedMonthKey = "";
+      renderDateDetail();
+      loadMonthEvents();
+    }
+  }
+
+  loadWeeklyData();
+}
+
+/* ==========================================
+   15. 주간 달력 렌더링
+========================================== */
+
+function renderWeekCalendar() {
+  weekCalendar.replaceChildren();
+
+  const lastDate = addDays(currentWeekStart,6);
+
+  document.getElementById("weekRange").textContent =
+    `${dateToString(currentWeekStart)} ~ ${dateToString(lastDate)}`;
+
+  for(let i=0;i<7;i++) {
+    const date = addDays(currentWeekStart,i);
+    const dateString = dateToString(date);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "calendar-day";
+
+    if(dateString===today) button.classList.add("today");
+    if(dateString===selectedDate) button.classList.add("selected");
+
+    const name = document.createElement("span");
+    name.className = "day-name";
+    name.textContent = `${dayNames[i]}요일`;
+
+    const number = document.createElement("span");
+    number.className = "day-number";
+    number.textContent = date.getDate();
+
+    button.append(name,number);
+
+    /* 주간 달력 클릭은 선택 날짜와 시간표만 변경 */
+    button.addEventListener("click",()=>{
+      selectDate(dateString,false);
+    });
+
+    weekCalendar.appendChild(button);
+  }
+}
+
+function changeWeek(amount) {
+  const newDate = addDays(currentWeekStart,amount*7);
+
+  selectedDate = dateToString(newDate);
+  currentWeekStart = getMonday(newDate);
+
+  renderWeekCalendar();
+  renderMonthCalendar();
+  renderWeeklyTable();
+  loadWeeklyData();
+}
+
+document.getElementById("prevWeek").addEventListener(
+  "click",()=>changeWeek(-1)
+);
+
+document.getElementById("nextWeek").addEventListener(
+  "click",()=>changeWeek(1)
+);
+
+/* ==========================================
+   16. 주간 시간표 API 조회
+========================================== */
+
+async function loadWeeklyData() {
+  const requestId = ++timetableRequestId;
+
+  weeklyTimetable = {};
+  timetableContent.hidden = true;
+
+  showStatus(timetableStatus,"일주일치 시간표를 불러오는 중입니다.");
+
+  const dates = [];
+
+  for(let i=0;i<7;i++) {
+    dates.push(dateToString(addDays(currentWeekStart,i)));
+  }
+
+  timetableWeekLabel.textContent =
+    `${dates[0]} ~ ${dates[6]}`;
+
+  try {
+    const results = await Promise.all(
+      dates.map(async date=>{
+        const apiDate = toApiDate(date);
+
+        const params = {
+          KEY:API_KEY,
+          Type:"json",
+          pIndex:"1",
+          pSize:"100",
+          ATPT_OFCDC_SC_CODE:OFFICE_CODE,
+          SD_SCHUL_CODE:SCHOOL_CODE,
+          AY:SCHOOL_YEAR,
+          GRADE:GRADE,
+          CLASS_NM:CLASS_NUMBER,
+          ALL_TI_YMD:apiDate
+        };
+
+        const data = await requestNeis(TIMETABLE_API,params);
+        const rows = getRows(data,"hisTimetable");
+
+        return {
+          date,
+          rows:rows.filter(row=>row.ALL_TI_YMD===apiDate)
+        };
+      })
+    );
+
+    if(requestId!==timetableRequestId) return;
+
+    results.forEach(result=>{
+      weeklyTimetable[result.date] = result.rows.sort(
+        (a,b)=>Number(a.PERIO)-Number(b.PERIO)
+      );
+    });
+
+    renderWeeklyTable();
+
+    const total = results.reduce(
+      (sum,item)=>sum+item.rows.length,0
+    );
+
+    if(total===0) {
+      showStatus(
+        timetableStatus,
+        "선택한 주에 조회 가능한 시간표가 없습니다."
+      );
+    } else {
+      showStatus(
+        timetableStatus,
+        `주간 시간표를 불러왔습니다. (총 ${total}개 항목)`,
+        "success"
+      );
+    }
+
+  } catch(error) {
+    if(requestId!==timetableRequestId) return;
+
+    console.error("시간표 조회 오류:",error);
+
+    showStatus(
+      timetableStatus,
+      `시간표를 불러오지 못했습니다.\n${error.message}`,
+      "error"
+    );
+
+    renderWeeklyTable();
+  }
+}
+
+/* ==========================================
+   17. 변경·보강 시간표 판별
+========================================== */
+
+function getTimetableChangeType(row) {
+  const values = Object.values(row)
+    .map(value=>String(value ?? ""))
+    .join(" ");
+
+  if(/보강/.test(values)) return "makeup";
+  if(/대체|교체/.test(values)) return "replacement";
+  if(/변경|수정|이동/.test(values)) return "change";
+
+  return "normal";
+}
+
+function getChangeLabel(type) {
+  if(type==="makeup") return "보강 수업";
+  if(type==="replacement") return "대체·교체 수업";
+  if(type==="change") return "변경 시간표";
+  return "";
+}
+
+/* ==========================================
+   18. 주간 시간표 표 생성
+========================================== */
+
+function renderWeeklyTable() {
+  weeklyTableHead.replaceChildren();
+  weeklyTableBody.replaceChildren();
+
+  const dates = [];
+
+  for(let i=0;i<7;i++) {
+    dates.push(dateToString(addDays(currentWeekStart,i)));
+  }
+
+  const header = document.createElement("tr");
+
+  const firstHeader = document.createElement("th");
+  firstHeader.textContent = "교시";
+  header.appendChild(firstHeader);
+
+  dates.forEach((date,index)=>{
+    const th = document.createElement("th");
+
+    const obj = parseDate(date);
+
+    th.textContent =
+      `${dayNames[index]}요일\n${obj.getMonth()+1}/${obj.getDate()}`;
+
+    if(date===selectedDate) {
+      th.classList.add("selected-column");
+    }
+
+    header.appendChild(th);
+  });
+
+  weeklyTableHead.appendChild(header);
+
+  const periods = new Set();
+
+  dates.forEach(date=>{
+    (weeklyTimetable[date]||[]).forEach(row=>{
+      if(row.PERIO) periods.add(Number(row.PERIO));
+    });
+  });
+
+  const sortedPeriods = Array.from(periods).sort((a,b)=>a-b);
+
+  if(sortedPeriods.length===0) {
+    const tr = document.createElement("tr");
+    const td = document.createElement("td");
+
+    td.colSpan = 8;
+    td.textContent = "등록된 시간표가 없습니다.";
+    td.className = "empty-cell";
+
+    tr.appendChild(td);
+    weeklyTableBody.appendChild(tr);
+    timetableContent.hidden = false;
+    return;
+  }
+
+  sortedPeriods.forEach(period=>{
+    const tr = document.createElement("tr");
+
+    const periodCell = document.createElement("td");
+    periodCell.textContent = `${period}교시`;
+    tr.appendChild(periodCell);
+
+    dates.forEach(date=>{
+      const td = document.createElement("td");
+
+      if(date===selectedDate) {
+        td.classList.add("selected-column");
+      }
+
+      const rows = (weeklyTimetable[date]||[]).filter(
+        row=>Number(row.PERIO)===period
+      );
+
+      if(rows.length===0) {
+        td.textContent = "-";
+        td.classList.add("empty-cell");
+      } else {
+        rows.forEach(row=>{
+          const subject = document.createElement("span");
+          subject.className = "subject-name";
+          subject.textContent =
+            cleanText(row.ITRT_CNTNT)||"과목 정보 없음";
+
+          td.appendChild(subject);
+
+          const changeType = getTimetableChangeType(row);
+
+          if(changeType!=="normal") {
+            const tag = document.createElement("span");
+            tag.className = "timetable-change";
+
+            if(changeType==="makeup") {
+              tag.classList.add("timetable-makeup");
+            }
+
+            if(changeType==="replacement") {
+              tag.classList.add("timetable-replacement");
+            }
+
+            tag.textContent = getChangeLabel(changeType);
+            td.appendChild(tag);
+          }
+        });
+      }
+
+      tr.appendChild(td);
+    });
+
+    weeklyTableBody.appendChild(tr);
+  });
+
+  timetableContent.hidden = false;
+}
+
+/* ==========================================
+   19. 초기 실행
+========================================== */
+
+function initialize() {
+  initializeTheme();
+
+  renderMonthCalendar();
+  renderWeekCalendar();
+  renderWeeklyTable();
+  renderDateDetail();
+
+  loadMonthEvents();
+  loadUpcomingEvents();
+  loadWeeklyData();
+}
+
+initialize();
+</script>
+
+<script>
+(() => {
+ const canvas=document.getElementById('ols-canvas'), ctx=canvas.getContext('2d');
+ ctx.imageSmoothingEnabled=false;
+ const W=960,H=600,T=32;
+ let scene='campus', gender='boy', player={x:480,y:470,dir:'down',moving:false,sitting:false};
+ let keys={}, last=0, nearby=null, panelOpen=false, dialogueOpen=false, toastTimer=0;
+ const buildings=[
+  {id:'classroom',name:'본관 · 2학년 6반',x:110,y:70,w:230,h:155,color:'#b96e49',door:{x:225,y:220}},
+  {id:'library',name:'도서관',x:620,y:65,w:220,h:150,color:'#b88a55',door:{x:730,y:210}},
+  {id:'cafeteria',name:'급식실',x:620,y:355,w:230,h:145,color:'#c58d55',door:{x:730,y:500}}
+ ];
+ const npcs=[
+  {x:420,y:310,name:'생활지도 선생님',role:'선생님',lines:['오늘도 좋은 하루 보내렴!','복도에서는 천천히 걸으렴.','오늘 일정은 확인했니?','수업 준비는 다 했니?']},
+  {x:540,y:420,name:'국어 선생님',role:'선생님',lines:['오늘 수업도 열심히 해보자.','책은 마음의 창이란다.','교실에서 보자꾸나.']},
+  {x:475,y:170,name:'학생',role:'학생',lines:['안녕! 오늘 시간표 확인했어?','도서관에 새 책이 들어왔대.','점심시간이 기다려진다!']}
+ ];
+ const interiorNPC={classroom:[
+  {x:480,y:145,name:'국어 담임 선생님',role:'담임 선생님',subject:'literature',lines:['오늘도 차근차근 배워보자.','시간표가 궁금하면 나에게 말을 걸렴.']},
+  {x:125,y:220,name:'수학 선생님',role:'수학',subject:'math',lines:['공식은 이해하는 것이 먼저란다.','한 문제씩 차근차근 풀어보자.']},
+  {x:275,y:220,name:'독일어 선생님',role:'독일어',subject:'german',lines:['Guten Morgen! 오늘도 독일어를 즐겨보자.','새로운 표현을 하나씩 익혀보렴.']},
+  {x:685,y:220,name:'영어 선생님',role:'영어',subject:'english',lines:['꾸준히 읽고 말하는 연습이 중요하단다.','오늘 배운 표현을 꼭 복습해보렴.']},
+  {x:835,y:220,name:'과학 선생님',role:'과학',subject:'science',lines:['궁금한 것을 관찰하는 태도가 중요해.','작은 질문에서 탐구가 시작된단다.']},
+  {x:835,y:340,name:'체육 선생님',role:'체육',subject:'pe',lines:['잠깐씩 몸을 풀어주는 것도 좋단다.','오늘도 활기차게 보내자!']}
+ ],
+ library:[{x:500,y:250,name:'사서 선생님',role:'사서 선생님',action:'dday',lines:['다가오는 학사일정과 D-DAY를 확인해 보렴.','중요한 시험과 학교 행사 일정을 정리해 두었단다.','궁금한 일정이 있으면 목록을 눌러 자세히 확인하렴.']}],
+ cafeteria:[{x:480,y:160,name:'급식실 선생님',role:'급식실 선생님',lines:['식사 시간에는 줄을 잘 서도록 하자.']}]};
+ const roomDefs={
+  classroom:{name:'2학년 6반 교실',floor:'#c99b69',walls:'#e4d7b4'},
+  library:{name:'도서관',floor:'#b88b61',walls:'#e8d9b6'},
+  cafeteria:{name:'급식실',floor:'#b9b4a0',walls:'#d9d2b8'}
+ };
+ const randLines=(a)=>a[Math.floor(Math.random()*a.length)];
+ function pixelRect(x,y,w,h,c){ctx.fillStyle=c;ctx.fillRect(Math.round(x),Math.round(y),Math.round(w),Math.round(h));}
+ function tile(x,y,c){pixelRect(x,y,T,T,c);pixelRect(x+2,y+2,2,2,'#ffffff12');}
+ function drawTree(x,y){
+  pixelRect(x+13,y+23,13,25,'#65442f');pixelRect(x+16,y+27,5,17,'#8c6340');
+  pixelRect(x-1,y+5,43,30,'#294d35');pixelRect(x+3,y-1,35,31,'#3c6b40');
+  pixelRect(x+8,y-7,25,28,'#54864b');pixelRect(x+2,y+13,17,18,'#477b46');
+  pixelRect(x+24,y+9,15,17,'#477b46');pixelRect(x+9,y+1,8,6,'#86a95a');
+  pixelRect(x+25,y+3,7,5,'#739c52');pixelRect(x+4,y+19,6,5,'#719a50');
+  pixelRect(x+30,y+19,5,4,'#8baa56');pixelRect(x+14,y+30,5,3,'#6d994c');
+  pixelRect(x+4,y+37,34,4,'#355a37');
+}
+ function drawFlower(x,y){pixelRect(x+5,y+8,4,4,'#f4d58d');pixelRect(x+1,y+8,4,4,'#e9a5b1');pixelRect(x+9,y+8,4,4,'#e9a5b1');pixelRect(x+5,y+4,4,4,'#e9a5b1');pixelRect(x+5,y+12,4,4,'#e9a5b1');}
+ function drawBuilding(b){
+  const x=b.x,y=b.y,w=b.w,h=b.h;
+  // Soft cast shadow and stone foundation
+  pixelRect(x-5,y+h-3,w+12,14,'#40583b');
+  pixelRect(x-4,y+h-10,w+8,13,'#66513d');
+  pixelRect(x,y+12,w,h-12,b.color);
+  // Building-specific silhouettes, rooflines and materials
+  if(b.id==='classroom'){
+   // Main school: broad red-brick facade, slate roof, central pediment
+   pixelRect(x-13,y-23,w+26,42,'#59443a');
+   pixelRect(x-8,y-20,w+16,31,'#8d5140');
+   pixelRect(x+12,y-13,w-24,18,'#b86d50');
+   pixelRect(x+w/2-48,y-39,96,25,'#d8c39a');
+   pixelRect(x+w/2-41,y-35,82,18,'#9b6847');
+   pixelRect(x+w/2-4,y-34,8,16,'#e8d7b1');
+   // brick courses
+   for(let yy=y+28;yy<y+h-12;yy+=13)for(let xx=x+4+(yy%2?0:9);xx<x+w-4;xx+=22)pixelRect(xx,yy,15,2,'#d28a68');
+   // stone entrance and broad stairs
+   pixelRect(x+w/2-30,y+h-54,60,48,'#5a4032');pixelRect(x+w/2-23,y+h-48,46,42,'#d0b184');
+   pixelRect(x+w/2-17,y+h-43,34,37,'#65432f');pixelRect(x+w/2+8,y+h-25,4,4,'#f1d27d');
+   pixelRect(x+w/2-44,y+h-7,88,6,'#d7c19a');
+   // tall framed windows
+   for(let xx=x+20;xx<x+w-15;xx+=48){
+    pixelRect(xx,y+42,29,54,'#614638');pixelRect(xx+4,y+46,21,46,'#83b2b2');
+    pixelRect(xx+13,y+46,3,46,'#e8d4a8');pixelRect(xx+4,y+66,21,3,'#e8d4a8');
+    pixelRect(xx-2,y+96,33,4,'#e1c89c');
+   }
+  }else if(b.id==='library'){
+   // Library: green mansard roof, warm stone walls, book-shaped sign
+   pixelRect(x-12,y-20,w+24,34,'#435b43');
+   pixelRect(x-6,y-16,w+12,24,'#587d55');
+   pixelRect(x+8,y-10,w-16,13,'#9db17a');
+   pixelRect(x+20,y+15,w-40,h-25,'#d7bd8d');
+   pixelRect(x+w/2-46,y-31,92,20,'#ead9ad');pixelRect(x+w/2-42,y-27,84,12,'#47684a');
+   // columns and arched entry
+   pixelRect(x+w/2-34,y+18,68,8,'#9a754c');
+   pixelRect(x+w/2-28,y+26,9,h-36,'#f0dfb8');pixelRect(x+w/2+19,y+26,9,h-36,'#f0dfb8');
+   pixelRect(x+w/2-19,y+h-48,38,42,'#604531');pixelRect(x+w/2-14,y+h-44,28,38,'#9b7650');
+   for(let xx=x+25;xx<x+w-30;xx+=58){pixelRect(xx,y+43,34,43,'#76533c');pixelRect(xx+4,y+47,26,34,'#8eb9b7');pixelRect(xx+16,y+47,3,34,'#f0dfb8');}
+   // book emblem
+   pixelRect(x+w/2-12,y-25,11,11,'#f2e7c6');pixelRect(x+w/2+1,y-25,11,11,'#f2e7c6');pixelRect(x+w/2-1,y-25,3,13,'#8c6041');
+  }else{
+   // Cafeteria: wide orange tiled roof, cream awning and serving-window identity
+   pixelRect(x-12,y-19,w+24,39,'#76503a');
+   pixelRect(x-7,y-15,w+14,28,'#c47b48');
+   for(let yy=y-9;yy<y+9;yy+=8)for(let xx=x-2;xx<x+w+4;xx+=22)pixelRect(xx,yy,18,3,'#e2a365');
+   pixelRect(x+15,y+20,w-30,h-30,'#e4c99a');
+   pixelRect(x+w/2-52,y-30,104,20,'#f0dfb7');pixelRect(x+w/2-47,y-26,94,12,'#9b573b');
+   // awning / serving counter
+   pixelRect(x+35,y+45,w-70,17,'#f4e7c7');
+   for(let xx=x+38;xx<x+w-35;xx+=24)pixelRect(xx,y+45,12,17,'#b85f47');
+   pixelRect(x+w/2-25,y+h-52,50,46,'#6b4934');pixelRect(x+w/2-19,y+h-47,38,40,'#9b7048');
+   for(let xx=x+18;xx<x+w-20;xx+=52){pixelRect(xx,y+77,30,37,'#654b3a');pixelRect(xx+4,y+81,22,29,'#9bc0bb');}
+  }
+  // Trim, corner stones and clear signboard
+  pixelRect(x-3,y+h-12,w+6,5,'#ead5aa');
+  pixelRect(x+w/2-49,y-53,98,17,'#63462f');
+  pixelRect(x+w/2-45,y-50,90,11,'#f0dfb7');
+  ctx.fillStyle='#59412e';ctx.font='bold 10px monospace';ctx.textAlign='center';
+  ctx.fillText(b.id==='classroom'?'MAIN SCHOOL':b.id==='library'?'LIBRARY':'CAFETERIA',x+w/2,y-42);
+  // small shrubs at the front corners
+  for(const sx of [x+7,x+w-28]){
+   pixelRect(sx,y+h-2,24,8,'#315a3c');pixelRect(sx+4,y+h-8,16,8,'#4f814d');pixelRect(sx+8,y+h-8,4,3,'#83a85b');
+  }
+ }
+ function drawAvatarPreview(target,kind){
+  const c=document.getElementById(target);if(!c)return;const g=c.getContext('2d');g.imageSmoothingEnabled=false;
+  const r=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h);};
+  // shadow, shoes, uniform and face
+  r(20,76,32,5,'#b7a17a');r(23,69,9,8,'#27323c');r(40,69,9,8,'#27323c');
+  r(21,39,30,30,'#294d75');r(24,42,24,5,'#f1e8d2');r(33,42,6,24,'#e8dfc9');
+  if(kind==='girl'){
+   // Long hair falls down both sides; bow at collar
+   r(18,12,36,34,'#49302c');r(15,25,9,42,'#49302c');r(48,25,9,42,'#49302c');
+   r(24,17,24,26,'#e8b58d');r(21,13,30,11,'#49302c');r(22,8,12,8,'#49302c');r(40,8,12,8,'#49302c');
+   r(32,43,8,5,'#bd4d58');r(28,44,6,6,'#e7a5a7');r(38,44,6,6,'#e7a5a7');
+   r(22,69,11,4,'#f0e4ca');r(39,69,11,4,'#f0e4ca');
+  }else{
+   // Short, neat hair with visible ears and side fringe
+   r(21,17,30,27,'#3b2925');r(24,13,24,9,'#3b2925');r(21,20,7,12,'#3b2925');r(43,19,8,10,'#3b2925');
+   r(25,19,22,24,'#e8b58d');r(26,17,12,5,'#3b2925');r(36,18,11,5,'#3b2925');
+   r(22,69,11,4,'#f0e4ca');r(39,69,11,4,'#f0e4ca');
+  }
+  r(29,29,3,3,'#392b27');r(40,29,3,3,'#392b27');
+ }
+ function drawPlayer(){
+  const x=player.x,y=player.y;
+  // ground shadow
+  pixelRect(x-10,y+17,20,4,'#38523a');
+  if(gender==='girl'){
+   // long hair visible behind shoulders and down the back
+   pixelRect(x-10,y-24,20,20,'#49302c');
+   pixelRect(x-12,y-12,5,29,'#49302c');pixelRect(x+7,y-12,5,29,'#49302c');
+   pixelRect(x-8,y-20,16,14,'#e8b58d');
+   pixelRect(x-10,y-25,20,8,'#49302c');pixelRect(x-8,y-29,12,6,'#49302c');
+   // ribbon bow on the hair
+   pixelRect(x+5,y-27,6,5,'#c94f62');pixelRect(x+10,y-30,5,5,'#e58b9a');pixelRect(x+10,y-24,5,5,'#e58b9a');
+   pixelRect(x-10,y-3,20,19,'#294f79');pixelRect(x-7,y-1,14,4,'#f0e4c6');
+   // collar ribbon
+   pixelRect(x-3,y+1,6,4,'#c84e60');pixelRect(x-6,y+3,4,5,'#e18b99');pixelRect(x+2,y+3,4,5,'#e18b99');
+  }else{
+   // short haircut
+   pixelRect(x-9,y-24,18,8,'#3b2925');pixelRect(x-8,y-20,16,16,'#e8b58d');
+   pixelRect(x-10,y-25,20,8,'#3b2925');pixelRect(x-8,y-29,13,6,'#3b2925');
+   pixelRect(x-9,y-4,18,17,'#294f79');pixelRect(x-7,y-2,14,4,'#f0e4c6');
+   pixelRect(x-3,y-1,6,3,'#bdc8d1');
+  }
+  // face details
+  pixelRect(x-4,y-13,2,2,'#392b27');pixelRect(x+3,y-13,2,2,'#392b27');
+  pixelRect(x-2,y-7,4,1,'#a66f5b');
+  // legs and shoes
+  pixelRect(x-8,y+12,6,8,'#26384c');pixelRect(x+2,y+12,6,8,'#26384c');
+  pixelRect(x-9,y+19,8,4,'#49352b');pixelRect(x+1,y+19,8,4,'#49352b');
+  if(player.moving){pixelRect(x-11,y+13,6,4,'#e9d5a8');pixelRect(x+5,y+13,6,4,'#e9d5a8');}
+  if(player.sitting){pixelRect(x-10,y+2,20,10,'#294f79');}
+ }
+ function drawNPC(n){
+  const x=n.x,y=n.y,subject=n.subject||'general';
+  const palettes={
+   literature:{hair:'#4a3028',coat:'#6b4b75',accent:'#e5c27b'},
+   math:{hair:'#3c3028',coat:'#405f86',accent:'#d6dbe3'},
+   german:{hair:'#69452f',coat:'#8a5c42',accent:'#e0c47c'},
+   english:{hair:'#49352d',coat:'#557b69',accent:'#e7e0cf'},
+   science:{hair:'#3b3430',coat:'#527d83',accent:'#a8d2c0'},
+   pe:{hair:'#4a3028',coat:'#9b6544',accent:'#e6d08b'},
+   general:{hair:'#49352d',coat:'#66835a',accent:'#e8d5a8'}
+  };
+  const p=palettes[subject]||palettes.general;
+  const isStudent=n.role==='학생';
+  const coat=isStudent?'#294f79':(subject==='general'?'#657b69':p.coat);
+  const hair=isStudent?'#332822':p.hair;
+  pixelRect(x-12,y+17,24,5,'#38523a');
+  // Slightly different silhouettes and uniform details distinguish students from faculty.
+  pixelRect(x-9,y-7,18,23,coat);pixelRect(x-7,y-4,14,5,isStudent?'#f1e7d1':p.accent);
+  if(isStudent){pixelRect(x-3,y-2,6,6,'#bd4d60');pixelRect(x-11,y+1,3,12,'#d5b48b');}
+  else {pixelRect(x-11,y-5,3,16,'#e4d5b7');pixelRect(x+8,y-5,3,16,'#e4d5b7');pixelRect(x-9,y-10,18,4,'#4c4137');}
+  pixelRect(x-7,y-20,14,14,'#d9a77e');pixelRect(x-9,y-23,18,8,hair);
+  pixelRect(x-8,y-15,3,3,'#302521');pixelRect(x+4,y-15,3,3,'#302521');
+  pixelRect(x-7,y+15,5,8,'#3a3a43');pixelRect(x+2,y+15,5,8,'#3a3a43');
+  // Subject-specific props make each fictional teacher visually distinct.
+  if(subject==='literature'){pixelRect(x+9,y-5,8,11,'#b98b4f');pixelRect(x+10,y-4,6,9,'#ead8aa');}
+  if(subject==='math'){pixelRect(x+9,y-9,8,8,'#e7e3d3');pixelRect(x+11,y-7,4,2,'#496d9b');}
+  if(subject==='german'){pixelRect(x+9,y-4,7,7,'#e7d5a6');pixelRect(x+10,y-3,5,5,'#a34d42');}
+  if(subject==='english'){pixelRect(x+9,y-4,8,9,'#d5e2d2');pixelRect(x+11,y-2,4,4,'#557b69');}
+  if(subject==='science'){pixelRect(x+9,y-5,7,9,'#b7d8d0');pixelRect(x+11,y-3,3,5,'#5c9b91');}
+  if(subject==='pe'){pixelRect(x+9,y-5,7,7,'#e8d08b');pixelRect(x+11,y-3,3,3,'#9b6544');}
+ }
+ function drawCampus(){
+  for(let y=0;y<H;y+=T)for(let x=0;x<W;x+=T)tile(x,y,((x/T+y/T)%2?'#76a65c':'#80ae65'));
+  // stone walkways
+  for(let x=0;x<W;x+=T)for(let y=270;y<340;y+=T){tile(x,y,'#b9a27e');pixelRect(x+4,y+4,22,2,'#d5c19a');}
+  for(let y=0;y<H;y+=T)for(let x=430;x<500;x+=T){tile(x,y,'#b9a27e');pixelRect(x+4,y+4,22,2,'#d5c19a');}
+  // flower beds
+  for(let i=0;i<22;i++)drawFlower(30+(i*41)%880,40+(i*67)%510);
+  [[45,60],[520,65],[870,90],[70,390],[545,500],[890,525],[380,80],[570,350]].forEach(p=>drawTree(...p));
+  // benches and lamps
+  [[380,400],[560,235],[90,490]].forEach(([x,y])=>{pixelRect(x,y,70,10,'#805334');pixelRect(x+3,y-8,64,8,'#a66c42');pixelRect(x+7,y+10,5,10,'#5b412e');pixelRect(x+58,y+10,5,10,'#5b412e');});
+  // Layered hedges and flower borders create a more finished RPG campus.
+  [[18,238,250],[700,238,220],[32,520,290],[650,535,250]].forEach(([x,y,w])=>{
+   pixelRect(x,y,w,10,'#315a3a');pixelRect(x+4,y-7,w-8,9,'#477b46');
+   for(let bx=x+12;bx<x+w-8;bx+=28){pixelRect(bx,y-9,8,4,'#739b50');pixelRect(bx+12,y-5,5,4,'#8eaa59');}
+  });
+  // Campus direction sign near the central path.
+  pixelRect(485,365,7,58,'#65452f');pixelRect(450,355,78,31,'#765037');
+  pixelRect(454,359,70,23,'#d8bd88');ctx.fillStyle='#59412e';ctx.font='bold 9px monospace';ctx.textAlign='center';ctx.fillText('HANYOUNG',489,374);
+  // More varied flowers with leaves and highlights.
+  for(let i=0;i<18;i++){const fx=25+(i*53)%900,fy=25+(i*83)%540;pixelRect(fx,fy+4,3,7,'#477b46');pixelRect(fx-3,fy,4,4,i%2?'#e8c6b0':'#f1df9e');pixelRect(fx+2,fy-2,4,4,i%3?'#f3e4c2':'#d78e8b');pixelRect(fx,fy,3,3,'#e6bd65');}
+  buildings.forEach(drawBuilding);
+  npcs.forEach(drawNPC);
+ }
+ function drawRoom(){
+  const def=roomDefs[scene];
+  pixelRect(0,0,W,H,def.walls);pixelRect(18,18,W-36,H-36,def.floor);
+  // Detailed floorboards / tiles, wall skirting and warm ambient bands.
+  if(scene==='cafeteria'){
+   for(let y=30;y<H-20;y+=32)for(let x=20;x<W-20;x+=32){pixelRect(x,y,30,30,((x/32+y/32)%2?'#c7c3ad':'#b9b6a4'));pixelRect(x+2,y+2,26,2,'#ded9c4');}
+  }else{
+   for(let y=35;y<H-25;y+=30){pixelRect(20,y,W-40,2,'#76543a');for(let x=25+(y%60);x<W-20;x+=120)pixelRect(x,y+3,2,25,'#a77b52');}
+  }
+  pixelRect(18,18,W-36,12,'#806047');pixelRect(18,H-34,W-36,12,'#76543a');
+  if(scene==='classroom'){
+   // Large classroom windows and sunlit curtains
+   for(let x=38;x<255;x+=92){pixelRect(x,65,70,112,'#70503a');pixelRect(x+5,70,60,102,'#8db8b7');pixelRect(x+33,70,4,102,'#f1dfb6');pixelRect(x+5,119,60,4,'#f1dfb6');pixelRect(x-5,60,80,7,'#ead8b3');}
+   // Chalkboard frame, chalk tray, chalk details
+   pixelRect(310,45,350,102,'#68472f');pixelRect(318,53,334,83,'#245c3e');
+   pixelRect(330,65,145,2,'#b9d6a1');pixelRect(330,79,105,2,'#b9d6a1');pixelRect(515,70,92,2,'#b9d6a1');
+   pixelRect(480,150,12,23,'#795538');pixelRect(430,172,110,13,'#785034');pixelRect(438,175,94,5,'#c49b64');
+   // teacher podium
+   pixelRect(447,188,66,38,'#855a39');pixelRect(453,193,54,9,'#c69b65');pixelRect(457,202,46,20,'#986d45');
+   // Student desks in orderly rows with chair backs and book props
+   for(let r=0;r<3;r++)for(let c=0;c<5;c++){
+    const x=112+c*150,y=300+r*76;
+    pixelRect(x+4,y+30,54,26,'#63462f');pixelRect(x,y,62,34,'#765038');pixelRect(x+4,y+4,54,25,'#c69a64');pixelRect(x+8,y+7,18,3,'#e9d7ac');
+    pixelRect(x+6,y+34,5,22,'#5a412f');pixelRect(x+51,y+34,5,22,'#5a412f');
+    pixelRect(x+14,y+39,34,6,'#8b6241');pixelRect(x+18,y+36,26,5,'#d4b27e');
+   }
+   // Class notice board and wall clock
+   pixelRect(45,205,120,65,'#6c482f');pixelRect(51,211,108,53,'#d6bd8e');pixelRect(94,218,3,36,'#6d523b');
+   pixelRect(467,18,26,26,'#76523a');pixelRect(471,22,18,18,'#f1e6c9');pixelRect(479,25,2,8,'#76523a');
+  }else if(scene==='library'){
+   // Tall bookcases along the walls, each with individually colored books
+   for(let x=35;x<900;x+=170){
+    pixelRect(x+4,65,126,142,'#553b2b');pixelRect(x,60,126,10,'#9b7047');pixelRect(x+5,70,116,130,'#765239');
+    for(let row=0;row<4;row++){const yy=78+row*29;pixelRect(x+8,yy+19,110,4,'#d2ad72');
+     for(let k=0;k<9;k++){const colors=['#a64f43','#466d80','#d4b66c','#547b51','#80649a','#d18a56'];pixelRect(x+11+k*12,yy,8,19,colors[(k+row)%colors.length]);pixelRect(x+12+k*12,yy+2,2,14,'#ffffff33');}
+    }
+   }
+   // Reading tables, chairs, lamps and open books
+   for(let x=160;x<800;x+=250){pixelRect(x,290,145,54,'#765037');pixelRect(x+5,294,135,43,'#c99e68');pixelRect(x+20,337,7,34,'#60432f');pixelRect(x+118,337,7,34,'#60432f');pixelRect(x+55,300,25,19,'#efe1bd');pixelRect(x+58,303,18,2,'#9c7650');}
+   // Proper wooden bulletin board: frame, cork, pinned notices and headings
+   pixelRect(315,410,330,112,'#533827');pixelRect(322,417,316,98,'#8e5e3d');pixelRect(329,424,302,84,'#bd9664');
+   pixelRect(343,432,275,15,'#65452f');ctx.fillStyle='#f5e4bc';ctx.font='bold 12px monospace';ctx.textAlign='center';ctx.fillText('SCHOOL NOTICE BOARD',480,443);
+   const papers=[[345,455,55,42,'#f6e8c9'],[409,455,62,42,'#e5e8cf'],[480,455,62,42,'#f3d8b5'],[551,455,65,42,'#f2e6c8']];
+   papers.forEach(([x,y,w,h,col],i)=>{pixelRect(x+2,y+3,w,h,'#694b35');pixelRect(x,y,w,h,col);pixelRect(x+w/2-2,y-2,5,5,['#b84e4a','#6687a0','#b88a4d','#8b6a9a'][i]);pixelRect(x+7,y+10,w-14,2,'#9b8869');pixelRect(x+7,y+17,w-20,2,'#b6a181');pixelRect(x+7,y+24,w-25,2,'#b6a181');});
+   pixelRect(365,525,230,8,'#6b4930');
+  }else{
+   // Cafeteria: bright tiled serving hall with kitchen counter and menu board
+   pixelRect(45,48,870,105,'#e4d8bd');pixelRect(52,55,856,90,'#a6b9ad');
+   for(let x=65;x<900;x+=42){pixelRect(x,62,34,76,'#d9e4d6');pixelRect(x+4,66,26,68,'#91aaa0');}
+   // serving counter
+   pixelRect(70,175,820,72,'#68472f');pixelRect(78,180,804,52,'#d9c18e');
+   for(let x=100;x<850;x+=145){pixelRect(x,186,110,36,'#f0e5c9');pixelRect(x+4,190,102,28,'#9fb7a9');pixelRect(x+8,194,94,20,'#c9d5c3');}
+   // tables and benches
+   for(let x=100;x<850;x+=245){for(let y of [315,430]){pixelRect(x,y,145,48,'#805538');pixelRect(x+6,y+5,133,36,'#c99b61');pixelRect(x+15,y+48,8,22,'#63452f');pixelRect(x+120,y+48,8,22,'#63452f');
+     pixelRect(x+25,y-22,32,17,'#69472f');pixelRect(x+29,y-18,24,11,'#b98a57');pixelRect(x+90,y-22,32,17,'#69472f');pixelRect(x+94,y-18,24,11,'#b98a57');
+    }}
+   // Meal menu board mounted by the entrance-side wall
+   pixelRect(340,55,280,92,'#563a29');pixelRect(347,62,266,78,'#c69c65');pixelRect(354,69,252,64,'#f0e3c2');
+   ctx.fillStyle='#70472e';ctx.font='bold 15px monospace';ctx.textAlign='center';ctx.fillText('TODAY  MENU',480,89);
+   ctx.font='11px monospace';ctx.fillText('TODAY\'S SCHOOL MEAL',480,112);
+   pixelRect(460,119,40,3,'#b27b48');
+  }
+  const list=interiorNPC[scene]||[];list.forEach(drawNPC);
+  // Entrance door
+  pixelRect(445,535,70,45,'#60402e');pixelRect(452,540,56,40,'#a8784e');
+ }
+ function currentNPCs(){return scene==='campus'?npcs:(interiorNPC[scene]||[]);}
+ function currentObjects(){
+  if(scene==='campus')return buildings.map(b=>({x:b.door.x,y:b.door.y+15,r:48,type:'building',id:b.id,name:b.name}));
+  if(scene==='classroom')return [{x:480,y:175,r:65,type:'teacher',name:'국어 담임 선생님'},{x:480,y:535,r:55,type:'exit',name:'캠퍼스로 나가기'},...Array.from({length:15},(_,i)=>({x:169+(i%5)*140,y:340+Math.floor(i/5)*75,r:35,type:'desk',name:'학생 책상'}))];
+  if(scene==='library')return [{x:480,y:465,r:85,type:'board',name:'학사일정 게시판'},{x:480,y:535,r:55,type:'exit',name:'캠퍼스로 나가기'}];
+  return [{x:480,y:175,r:82,type:'mealboard',name:'오늘의 급식 메뉴'},{x:480,y:535,r:55,type:'exit',name:'캠퍼스로 나가기'}];
+ }
+ function nearTarget(){
+  let best=null,dist=999;
+  for(const o of currentObjects()){const d=Math.hypot(player.x-o.x,player.y-o.y);if(d<o.r&&d<dist){best=o;dist=d;}}
+  for(const n of currentNPCs()){const d=Math.hypot(player.x-n.x,player.y-n.y);if(d<38&&d<dist){best={type:'npc',npc:n,name:n.name};dist=d;}}
+  return best;
+ }
+ function showToast(s){const el=document.getElementById('ols-toast');el.textContent=s;el.classList.remove('ols-hidden');clearTimeout(toastTimer);toastTimer=setTimeout(()=>{if(!nearby)el.textContent='WASD 또는 방향키로 이동하세요 · E 상호작용';},2600);}
+ function enterRoom(id){scene=id;player.x=480;player.y=490;player.dir='up';player.sitting=false;showToast(roomDefs[id].name+'에 들어왔습니다.');}
+ function leaveRoom(){scene='campus';player.x=480;player.y=365;player.dir='down';player.sitting=false;}
+ function openPanel(title,html){panelOpen=true;document.getElementById('ols-panel-title').textContent=title;document.getElementById('ols-panel-content').innerHTML=html;document.getElementById('ols-panel-overlay').classList.remove('ols-hidden');}
+ function closePanel(){panelOpen=false;document.getElementById('ols-panel-overlay').classList.add('ols-hidden');}
+ async function openTimetable(){
+  // Reuse the original NEIS weekly timetable state and loader without changing its API logic.
+  if(!Object.keys(weeklyTimetable).length || !weeklyTimetable[dateToString(currentWeekStart)]){
+    showToast('주간 시간표를 불러오는 중입니다.');
+    await loadWeeklyData();
+  }
+  const dates=Array.from({length:7},(_,i)=>dateToString(addDays(currentWeekStart,i)));
+  const periods=[...new Set(dates.flatMap(d=>(weeklyTimetable[d]||[]).map(r=>Number(r.PERIO)).filter(Boolean)))].sort((a,b)=>a-b);
+  let table=`<div class="ols-modal-row"><button class="ols-btn" id="ols-week-prev">← 이전 주</button><b>${dates[0]} ~ ${dates[6]}</b><button class="ols-btn" id="ols-week-next">다음 주 →</button></div>`;
+  table+=`<div class="ols-table-wrap"><table class="ols-week-table"><thead><tr><th>교시</th>${dates.map((d,i)=>`<th class="${d===selectedDate?'selected':''}" data-day="${d}">${['월','화','수','목','금','토','일'][i]}<br>${Number(d.slice(5,7))}/${Number(d.slice(8,10))}</th>`).join('')}</tr></thead><tbody>`;
+  if(!periods.length)table+=`<tr><td colspan="8">이번 주에 조회된 시간표가 없습니다.</td></tr>`;
+  for(const period of periods){
+    table+=`<tr><th>${period}교시</th>`;
+    for(const d of dates){
+      const lesson=(weeklyTimetable[d]||[]).filter(r=>Number(r.PERIO)===period);
+      table+=`<td class="${d===selectedDate?'selected':''}" data-pick-date="${d}">${lesson.length?lesson.map(r=>`<span>${escapeHTML(cleanText(r.ITRT_CNTNT)||'과목 정보 없음')}</span>${getChangeLabel(getTimetableChangeType(r))?`<small>${escapeHTML(getChangeLabel(getTimetableChangeType(r)))}</small>`:''}`).join('<hr>'):'-'}</td>`;
+    }
+    table+='</tr>';
+  }
+  table+='</tbody></table></div><p class="ols-small">NEIS에서 조회한 한영외고 2학년 6반의 실제 주간 시간표입니다. 표의 날짜를 누르면 해당 날짜를 선택합니다.</p>';
+  openPanel('교실 · 주간 시간표',table);
+  document.getElementById('ols-week-prev').addEventListener('click',()=>olsChangeWeek(-1));
+  document.getElementById('ols-week-next').addEventListener('click',()=>olsChangeWeek(1));
+  document.querySelectorAll('[data-pick-date]').forEach(cell=>cell.addEventListener('click',()=>{selectDate(cell.dataset.pickDate);updateDateLabel();openTimetable();}));
+  document.querySelectorAll('[data-day]').forEach(cell=>cell.addEventListener('click',()=>{selectDate(cell.dataset.day);updateDateLabel();openTimetable();}));
+ }
+ async function olsChangeWeek(delta){
+  const target=addDays(currentWeekStart,delta*7);
+  selectedDate=dateToString(target);
+  currentWeekStart=getMonday(target);
+  displayedMonth=new Date(target.getFullYear(),target.getMonth(),1);
+  renderWeekCalendar();renderMonthCalendar();renderWeeklyTable();
+  await loadWeeklyData();
+  openTimetable();
+ }
+ function escapeHTML(value){
+  return String(value??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+ }
+ function openBoard(){
+  const y=displayedMonth.getFullYear(),m=displayedMonth.getMonth();
+  const first=new Date(y,m,1),offset=(first.getDay()+6)%7,days=new Date(y,m+1,0).getDate();
+  let content=`<div class="ols-modal-row"><button class="ols-btn" id="ols-month-prev">◀ 이전 달</button><b>${y}년 ${m+1}월</b><button class="ols-btn" id="ols-month-next">다음 달 ▶</button></div>`;
+  content+='<div class="ols-month-grid">'+['월','화','수','목','금','토','일'].map(x=>`<b>${x}</b>`).join('');
+  for(let i=0;i<offset;i++)content+='<span></span>';
+  for(let day=1;day<=days;day++){
+    const date=`${y}-${String(m+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const events=getEventsForDate(date);
+    content+=`<button class="ols-month-day ${date===selectedDate?'selected':''} ${date===today?'today':''}" data-calendar-date="${date}">${day}${events.length?`<i>${events.length} 일정</i>`:''}</button>`;
+  }
+  content+='</div><div id="ols-date-events" class="ols-date-events"></div><p class="ols-small">NEIS 학사일정 API에 등록된 실제 일정만 표시합니다. 날짜를 선택하면 해당 날짜의 상세 일정을 확인할 수 있습니다.</p>';
+  openPanel('도서관 게시판 · 학사일정 달력',content);
+  document.getElementById('ols-month-prev').addEventListener('click',()=>olsChangeMonth(-1));
+  document.getElementById('ols-month-next').addEventListener('click',()=>olsChangeMonth(1));
+  document.querySelectorAll('[data-calendar-date]').forEach(btn=>btn.addEventListener('click',()=>{selectDate(btn.dataset.calendarDate,true);updateDateLabel();openBoard();}));
+  renderBoardDateEvents();
+ }
+ function renderBoardDateEvents(){
+  const host=document.getElementById('ols-date-events');if(!host)return;
+  const events=getEventsForDate(selectedDate);
+  host.innerHTML=`<h3>${selectedDate} · ${getWeekday(selectedDate)}</h3>`+(events.length?events.map(r=>`<article><b>${escapeHTML(eventName(r))}</b><p>${escapeHTML(eventContent(r)||'상세 내용이 등록되어 있지 않습니다.')}</p><small>${escapeHTML(formatApiDate(eventStart(r)))}${eventEnd(r)!==eventStart(r)?' ~ '+escapeHTML(formatApiDate(eventEnd(r))):''}</small></article>`).join(''):'<p>선택한 날짜에 등록된 학사일정이 없습니다.</p>');
+ }
+ async function olsChangeMonth(delta){
+  displayedMonth=new Date(displayedMonth.getFullYear(),displayedMonth.getMonth()+delta,1);
+  const key=getMonthKey(displayedMonth);
+  if(loadedMonthKey!==key)await loadMonthEvents();else renderMonthCalendar();
+  openBoard();
+ }
+ function openDday(){
+  const events=getMajorEvents(upcomingEvents).filter(r=>validApiDate(eventStart(r))).sort((a,b)=>eventStart(a).localeCompare(eventStart(b)));
+  const now=parseDate(today);
+  let content='<p>NEIS 학사일정에서 확인한 주요 일정의 디데이입니다.</p>';
+  if(!events.length)content+='<p>다가오는 주요 일정이 없습니다. 학사일정 데이터를 불러오고 있습니다.</p>';
+  events.forEach(r=>{
+   const d=dateDifference(now,parseDate(dateStringFromApi(eventStart(r))));
+   const label=d<0?'진행 중':d===0?'D-DAY':`D-${d}`;
+   content+=`<div class="ols-dday-item"><span><small>${escapeHTML(formatApiDate(eventStart(r)))}</small><b>${escapeHTML(eventName(r))}</b></span><strong>${label}</strong></div>`;
+  });
+  openPanel('다가오는 일정 · D-DAY',content);
+ }
+ async function fetchMealForDate(dateString, mealCode='2'){
+  const apiDate=toApiDate(dateString);
+  const cacheKey=apiDate+'-'+mealCode;
+  if(mealCache.has(cacheKey))return mealCache.get(cacheKey);
+  const token=++mealRequestToken;
+  const params={KEY:API_KEY,Type:'json',pIndex:'1',pSize:'100',ATPT_OFCDC_SC_CODE:OFFICE_CODE,SD_SCHUL_CODE:SCHOOL_CODE,MMEAL_SC_CODE:mealCode,MLSV_YMD:apiDate};
+  const data=await requestNeis(MEAL_API,params);
+  const rows=getRows(data,'mealServiceDietInfo');
+  if(token===mealRequestToken)mealCache.set(cacheKey,rows);
+  return rows;
+ }
+ async function openMealBoard(){
+  openPanel('급식실 · 오늘의 급식','<p>NEIS 급식 정보를 불러오는 중입니다…</p>');
+  const dateAtRequest=selectedDate;
+  try{
+   const [lunchRows,dinnerRows]=await Promise.all([
+    fetchMealForDate(dateAtRequest,'2'),
+    fetchMealForDate(dateAtRequest,'3')
+   ]);
+   if(!panelOpen)return;
+   if(dateAtRequest!==selectedDate)return openMealBoard();
+   const renderMeal=(rows,title)=>rows.length?rows.map(row=>{
+    const dishes=cleanText(row.DDISH_NM||'').split(/\n+/).map(x=>x.trim()).filter(Boolean);
+    return `<section class="ols-meal-slip"><header><b>${escapeHTML(row.MMEAL_SC_NM||title)}</b><span>${escapeHTML(formatApiDate(row.MLSV_YMD||toApiDate(dateAtRequest)))}</span></header><ul>${dishes.map(d=>`<li>${escapeHTML(d)}</li>`).join('')}</ul><footer>${row.CAL_INFO?`열량 ${escapeHTML(row.CAL_INFO)}`:''}</footer></section>`;
+   }).join(''):`<section class="ols-meal-slip ols-meal-empty"><header><b>${title}</b></header><p>선택한 날짜에 등록된 ${title} 정보가 없습니다.</p></section>`;
+   const html=renderMeal(lunchRows,'중식')+renderMeal(dinnerRows,'석식');
+   const dateControls=`<div class="ols-modal-row"><button class="ols-btn" id="ols-meal-prev">◀ 이전 날짜</button><b>${dateAtRequest}</b><button class="ols-btn" id="ols-meal-next">다음 날짜 ▶</button></div>`;
+   document.getElementById('ols-panel-content').innerHTML=`${dateControls}${html}<p class="ols-small">출처: 교육부 NEIS 급식식단정보(mealServiceDietInfo). 메뉴에 포함된 알레르기 유발 식품 번호는 원본 표기를 유지합니다.</p>`;
+   document.getElementById('ols-meal-prev').addEventListener('click',()=>{moveDate(-1);openMealBoard();});
+   document.getElementById('ols-meal-next').addEventListener('click',()=>{moveDate(1);openMealBoard();});
+  }catch(error){
+   if(!panelOpen)return;
+   document.getElementById('ols-panel-content').innerHTML=`<p>급식 정보를 불러오지 못했습니다.</p><p class="ols-small">${escapeHTML(error.message||'NEIS API 오류')}</p><button class="ols-btn" id="ols-meal-retry">다시 시도</button>`;
+   document.getElementById('ols-meal-retry').addEventListener('click',()=>{mealCache.delete(toApiDate(selectedDate));openMealBoard();});
+  }
+ }
+ function interact(){
+  const t=nearTarget();if(!t){showToast('주변에 상호작용할 대상이 없습니다.');return;}
+  if(t.type==='building'){enterRoom(t.id);return;}
+  if(t.type==='exit'){leaveRoom();return;}
+  if(t.type==='teacher'){openTimetable();return;}
+  if(t.type==='board'){openBoard();return;}
+  if(t.type==='mealboard'){openMealBoard();return;}
+  if(t.type==='desk'){player.sitting=!player.sitting;showToast(player.sitting?'책상에 앉았습니다. 우클릭으로 일어나세요.':'자리에서 일어났습니다.');return;}
+  if(t.type==='npc'){const n=t.npc;if(n.action==='dday'){openDday();return;}document.getElementById('ols-speaker').textContent=n.name;document.getElementById('ols-dialogue-text').textContent=randLines(n.lines);document.getElementById('ols-dialogue').classList.remove('ols-hidden');dialogueOpen=true;}
+ }
+ function closeDialogue(){dialogueOpen=false;document.getElementById('ols-dialogue').classList.add('ols-hidden');}
+ function updateDateLabel(){document.getElementById('ols-date-label').textContent=selectedDate||'날짜';}
+ function moveDate(n){const d=new Date(selectedDate+'T12:00:00');d.setDate(d.getDate()+n);selectDate(d.toISOString().slice(0,10),true);updateDateLabel();}
+ function update(dt){
+  if(panelOpen||dialogueOpen||document.getElementById('ols-start').classList.contains('ols-hidden')===false)return;
+  if(player.sitting)return;
+  let dx=0,dy=0;
+  if(keys.KeyW||keys.ArrowUp){dy=-1;player.dir='up';}
+  if(keys.KeyS||keys.ArrowDown){dy=1;player.dir='down';}
+  if(keys.KeyA||keys.ArrowLeft){dx=-1;player.dir='left';}
+  if(keys.KeyD||keys.ArrowRight){dx=1;player.dir='right';}
+  const len=Math.hypot(dx,dy)||1;dx/=len;dy/=len;
+  player.moving=!!(dx||dy);
+  const speed=150*dt;
+  const nx=Math.max(25,Math.min(W-25,player.x+dx*speed));
+  const ny=Math.max(35,Math.min(H-25,player.y+dy*speed));
+  // Simple solid-object collision on campus; interiors retain walkable furniture lanes.
+  let blocked=false;
+  if(scene==='campus'){
+   for(const b of buildings){if(nx>b.x-18&&nx<b.x+b.w+18&&ny>b.y-5&&ny<b.y+b.h+18)blocked=true;}
+   for(const p of [[45,60],[520,65],[870,90],[70,390],[545,500],[890,525],[380,80],[570,350]])if(Math.hypot(nx-p[0]-18,ny-p[1]-18)<24)blocked=true;
+  } else if(scene==='classroom'){
+   if(ny<112&&nx>285&&nx<675)blocked=true;
+  }
+  if(!blocked){player.x=nx;player.y=ny;}
+ }
+ function render(){
+  ctx.clearRect(0,0,W,H);
+  if(scene==='campus')drawCampus();else drawRoom();
+  // depth order by y
+  drawPlayer();
+  nearby=nearTarget();
+  if(nearby){ctx.fillStyle='#fff1c8';ctx.font='bold 14px monospace';ctx.textAlign='center';ctx.fillText('우클릭',player.x,player.y-38);document.getElementById('ols-toast').textContent='마우스 우클릭 · '+nearby.name;}
+  else if(!dialogueOpen&&!panelOpen)document.getElementById('ols-toast').textContent=scene==='campus'?'WASD 이동 · 우클릭으로 본관 / 도서관 / 급식실 상호작용':'WASD 이동 · 마우스 우클릭 상호작용 · 출입문으로 나가기';
+  // scene label
+  pixelRect(12,12,190,28,'#18251ddd');ctx.fillStyle='#f7e6bd';ctx.font='bold 13px monospace';ctx.textAlign='left';ctx.fillText(scene==='campus'?'MAIN CAMPUS':roomDefs[scene].name,22,31);
+ }
+ function loop(ts){const dt=Math.min(.04,(ts-last)/1000||0);last=ts;update(dt);render();requestAnimationFrame(loop);}
+ window.addEventListener('keydown',e=>{if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();if(e.code==='Escape'){if(panelOpen)closePanel();else if(dialogueOpen)closeDialogue();return;}if(e.code==='Enter'&&!e.repeat&&dialogueOpen){closeDialogue();return;}keys[e.code]=true;});
+ window.addEventListener('keyup',e=>{keys[e.code]=false;});
+ canvas.addEventListener('contextmenu',e=>e.preventDefault());
+ canvas.addEventListener('pointerdown',e=>{
+  if(e.button===2){e.preventDefault();if(!panelOpen&&!dialogueOpen)interact();}
+ });
+ document.querySelectorAll('[data-key]').forEach(b=>{const k=b.dataset.key;b.addEventListener('pointerdown',e=>{e.preventDefault();keys[k]=true;});['pointerup','pointerleave','pointercancel'].forEach(ev=>b.addEventListener(ev,()=>keys[k]=false));});
+ function resetGameProgress(){
+  scene='campus';
+  player.x=480;player.y=470;player.dir='down';player.moving=false;player.sitting=false;
+  keys={};nearby=null;
+  selectedDate=today;
+  currentWeekStart=getMonday(parseDate(today));
+  displayedMonth=new Date(parseDate(today).getFullYear(),parseDate(today).getMonth(),1);
+  updateDateLabel();
+ }
+ document.getElementById('ols-touch-action').addEventListener('click',interact);
+ document.getElementById('ols-enter-school').addEventListener('click',()=>{
+  document.getElementById('ols-title-screen').classList.add('ols-hidden');
+  document.getElementById('ols-start').classList.remove('ols-hidden');
+ });
+ document.getElementById('ols-start-btn').addEventListener('click',()=>{
+  resetGameProgress();
+  document.getElementById('ols-start').classList.add('ols-hidden');
+  document.getElementById('ols-title-screen').classList.add('ols-hidden');
+ });
+ document.getElementById('ols-home').addEventListener('click',()=>{
+  closePanel();closeDialogue();resetGameProgress();
+  document.getElementById('ols-start').classList.add('ols-hidden');
+  document.getElementById('ols-title-screen').classList.remove('ols-hidden');
+ });
+ document.getElementById('ols-character').addEventListener('click',()=>{
+  closePanel();closeDialogue();document.getElementById('ols-start').classList.remove('ols-hidden');
+ });
+
+ document.querySelectorAll('[data-gender]').forEach(b=>b.addEventListener('click',()=>{gender=b.dataset.gender;document.querySelectorAll('[data-gender]').forEach(x=>x.classList.toggle('selected',x===b));}));
+ drawAvatarPreview('ols-boy-preview','boy');drawAvatarPreview('ols-girl-preview','girl');
+ document.getElementById('ols-panel-close').addEventListener('click',closePanel);
+ document.getElementById('ols-dialogue-close').addEventListener('click',closeDialogue);
+ document.getElementById('ols-date-prev').addEventListener('click',()=>{moveDate(-1);});
+ document.getElementById('ols-date-next').addEventListener('click',()=>{moveDate(1);});
+ document.getElementById('ols-date-today').addEventListener('click',()=>{selectDate(dateToString(new Date()),true);updateDateLabel();});
+ document.getElementById('ols-help').addEventListener('click',()=>openPanel('조작 안내','<p>WASD / 방향키: 이동</p><p>마우스 우클릭: 건물 출입, NPC 대화, 게시판 확인, 책상에 앉기</p><p>ESC: 열린 창 닫기</p><p>모바일은 화면 아래 방향 버튼과 상호작용 버튼을 사용하세요.</p>'));
+ updateDateLabel();requestAnimationFrame(loop);
+})();
+</script>
+
+</body>
+</html>
